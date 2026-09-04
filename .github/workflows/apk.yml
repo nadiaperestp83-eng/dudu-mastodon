@@ -9,7 +9,6 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: '11'
-      #- run: git config --system core.longpaths true
       - uses: subosito/flutter-action@v1.4.0
         with:
           flutter-version: '1.22.6'
@@ -24,11 +23,16 @@ jobs:
         run: echo "ndk.dir=${{ steps.setup-ndk.outputs.ndk-path }}" > android/local.properties
       - name: Build
         env:
-          KEY_JKS: ${{ secrets.KEY_JKS }}
-          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-          STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
-        run: echo -n $KEY_JKS | base64 --decode > android/key.jks && flutter pub get && flutter build apk --release
+          MASTODON_CLIENT_ID: ${{ secrets.MASTODON_CLIENT_ID }}
+          MASTODON_CLIENT_SECRET: ${{ secrets.MASTODON_CLIENT_SECRET }}
+          MASTODON_REDIRECT_URI: ${{ secrets.MASTODON_REDIRECT_URI }}
+        run: |
+          flutter pub get
+          flutter build apk --debug \
+            --dart-define=MASTODON_CLIENT_ID=$MASTODON_CLIENT_ID \
+            --dart-define=MASTODON_CLIENT_SECRET=$MASTODON_CLIENT_SECRET \
+            --dart-define=MASTODON_REDIRECT_URI=$MASTODON_REDIRECT_URI
       - uses: actions/upload-artifact@v1
         with:
-          name: release-apk
-          path: build/app/outputs/apk/release/app-release.apk
+          name: debug-apk
+          path: build/app/outputs/apk/debug/app-debug.apk
