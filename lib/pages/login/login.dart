@@ -6,7 +6,6 @@ import 'package:dudu/models/json_serializable/owner_account.dart';
 import 'package:dudu/models/local_account.dart';
 import 'package:dudu/models/logined_user.dart';
 import 'package:dudu/models/provider/settings_provider.dart';
-import 'package:dudu/models/runtime_config.dart';
 import 'package:dudu/pages/home_page.dart';
 import 'package:dudu/pages/webview/inner_browser.dart';
 import 'package:dudu/public.dart';
@@ -21,9 +20,7 @@ import 'package:nav_router/nav_router.dart';
 import 'package:http/http.dart' as http;
 
 import 'model/app_credential.dart';
-import 'model/server_item.dart';
 import 'model/token.dart';
-import 'server_list.dart';
 
 class Login extends StatefulWidget {
   final bool showBackButton;
@@ -35,51 +32,50 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
-  final TextEditingController _controller = new TextEditingController();
   bool _clickButton = false;
 
   bool isLoading = false; // 是否登录成功获取token中
 
+  // Servidor fixo: sempre mastodon.social, sem tela de escolha.
+  final String _hostUrl = AppConfig.fixedHost;
+
   @override
   void initState() {
     super.initState();
-    if (!widget.showBackButton && RuntimeConfig.defaultServer != null) {
-      _controller.text = RuntimeConfig.defaultServer;
-    }
   }
 
-// 请求app的信息
-  Future<void> _postApps(String hostUrl) async {
+  // Monta o AppCredential com as chaves fixas (não registra mais via API)
+  // e abre direto a tela de autorização do Mastodon.
+  Future<void> _startLogin() async {
+    if (AppConfig.fixedClientId.isEmpty || AppConfig.fixedClientSecret.isEmpty) {
+      DialogUtils.showSimpleAlertDialog(
+        context: navGK.currentState.overlay.context,
+        text: 'Client ID/Secret não configurados no build.',
+        onlyInfo: true,
+      );
+      return;
+    }
+
     setState(() {
       _clickButton = true;
     });
 
-    Map paramsMap = Map();
-    paramsMap['client_name'] = AppConfig.ClientName;
-    paramsMap['redirect_uris'] = AppConfig.RedirectUris;
-    paramsMap['scopes'] = AppConfig.Scopes;
-    paramsMap['website'] = AppConfig.website;
+    AppCredential model = AppCredential(
+      '0',
+      AppConfig.ClientName,
+      AppConfig.fixedRedirectUri,
+      AppConfig.fixedClientId,
+      AppConfig.fixedClientSecret,
+      null,
+    );
 
-    var response;
-    try {
-      response = await http.post('$hostUrl' + Api.Apps, body: paramsMap);
-    } catch (e) {
-      DialogUtils.showSimpleAlertDialog(context: navGK.currentState.overlay.context,text: S.of(context).unable_to_connect_to_server,onlyInfo: true);
-      return;
-    } finally {
-      setState(() {
-        _clickButton = false;
-      });
-    }
-
-
-
-
-    AppCredential model = AppCredential.fromJson(json.decode(response.body));
     setState(() {
       _clickButton = false;
     });
-    final result = await AppNavigate.push(InnerBrowser(hostUrl, appCredential: model,),);
+
+    final result = await AppNavigate.push(
+      InnerBrowser(_hostUrl, appCredential: model),
+    );
 
     if (result == null) {
       return;
@@ -87,7 +83,7 @@ class _LoginState extends State<Login> {
     setState(() {
       isLoading = true;
     });
-    await _getToken(result, model, hostUrl);
+    await _getToken(result, model, _hostUrl);
   }
 
 // 获取token，此后的每次请求都需带上此token
@@ -141,23 +137,6 @@ class _LoginState extends State<Login> {
         isLoading = false;
       });
       debugPrint(e);
-    }
-  }
-
-  void _checkInputText() {
-    if (_controller.text == null || _controller.text.length == 0) {
-      return;
-    }
-    String hostUrl = 'https://${_controller.text}';
-    _postApps(hostUrl);
-  }
-
-// 跳转到选择节点页面
-  void _chooseServer(BuildContext context) async{
-    ServerItem item = await AppNavigate.push(ServerList());
-    if (item != null) {
-      _controller.text = item.name;
-      _checkInputText();
     }
   }
 
@@ -245,31 +224,14 @@ class _LoginState extends State<Login> {
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.all(Radius.circular(2))),
                       elevation: 5,
-                      child: Row(
-                        children: <Widget>[
-                          Container(
-                            padding: EdgeInsets.fromLTRB(15, 10, 15, 10),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                Text(S.of(context).domain_name, style: TextStyle(fontSize: 16))
-                              ],
-                            ),
-                          ),
-                          Expanded(
-                            child: Container(
-                              child: TextField(
-                                controller: _controller,
-                                decoration: new InputDecoration(
-                                    hintText: '例如：mastodon.online',
-                                    disabledBorder: InputBorder.none,
-                                    enabledBorder: InputBorder.none,
-                                    focusedBorder: InputBorder.none,
-                                    labelStyle: TextStyle(fontSize: 16)),
-                              ),
-                            ),
-                          )
-                        ],
+                      child: Padding(
+                        padding: EdgeInsets.all(15),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Text(_hostUrl.replaceAll('https://', ''), style: TextStyle(fontSize: 16))
+                          ],
+                        ),
                       ),
                     ),
                     Padding(
@@ -279,7 +241,7 @@ class _LoginState extends State<Login> {
                           Expanded(
                             child: RaisedButton(
                               onPressed: () {
-                                _checkInputText();
+                                _startLogin();
                               },
                               child: Padding(
                                 padding: EdgeInsets.all(10),
@@ -294,7 +256,7 @@ class _LoginState extends State<Login> {
                     Padding(
                       padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
                           GestureDetector(
                             onTap: () {
@@ -303,18 +265,6 @@ class _LoginState extends State<Login> {
                             child: Container(
                               child: Center(
                                 child: Text(S.of(context).about_mastodon,
-                                    style:
-                                        TextStyle(color: Theme.of(context).primaryColor)),
-                              ),
-                            ),
-                          ),
-                          InkWell(
-                            onTap: () {
-                              AppNavigate.push(InnerBrowser('http://dudu.today/instance.html'));
-                            },
-                            child: Container(
-                              child: Center(
-                                child: Text(S.of(context).example_recommendation,
                                     style:
                                         TextStyle(color: Theme.of(context).primaryColor)),
                               ),
