@@ -6,7 +6,7 @@ import 'package:nav_router/nav_router.dart';
 class AppConfig {
   static String get ClientName => S.of(navGK.currentState.overlay.context).app_name;
   static String RedirectUris = 'http://dudu.today/redirect.html';
-  static String Scopes = 'read write follow push admin:write:accounts';
+  static String Scopes = 'read write follow push';
   static String website = 'http://dudu.today';
 
   static const String instancesUrl = 'http://api.idudu.fans/static/instances';
