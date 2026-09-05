@@ -36,6 +36,7 @@ jobs:
           MASTODON_CLIENT_SECRET: ${{ secrets.MASTODON_CLIENT_SECRET }}
           MASTODON_REDIRECT_URI: ${{ secrets.MASTODON_REDIRECT_URI }}
         run: |
+          rm -f pubspec.lock
           flutter pub get
           flutter build apk --debug \
             --dart-define=MASTODON_CLIENT_ID=$MASTODON_CLIENT_ID \
