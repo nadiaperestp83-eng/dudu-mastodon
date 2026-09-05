@@ -34,6 +34,12 @@ jobs:
 
           sed -i '/^cached_video_player=/d' .flutter-plugins || true
 
+          REGISTRANT="android/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java"
+          if [ -f "$REGISTRANT" ]; then
+            sed -i '/cached_video_player/d' "$REGISTRANT"
+            echo "cached_video_player removido do GeneratedPluginRegistrant.java"
+          fi
+
           python3 - <<'PYEOF'
           import json
           path = ".flutter-plugins-dependencies"
