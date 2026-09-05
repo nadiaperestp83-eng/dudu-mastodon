@@ -39,7 +39,7 @@ class _InnerBrowserState extends State<InnerBrowser> {
     url = widget.url;
     title = '';
     if (widget.appCredential != null) {
-      url = '$url/oauth/authorize?scope=read+write+follow+push+admin%3Awrite%3Aaccounts&response_type=code&redirect_uri=${widget.appCredential.redirectUri}&client_id=${widget.appCredential.clientId}';
+      url = '$url/oauth/authorize?scope=read+write+follow+push&response_type=code&redirect_uri=${widget.appCredential.redirectUri}&client_id=${widget.appCredential.clientId}';
     }
     if (Platform.isAndroid) WebView.platform = SurfaceAndroidWebView();
   }
