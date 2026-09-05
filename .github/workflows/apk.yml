@@ -37,11 +37,39 @@ jobs:
           MASTODON_REDIRECT_URI: ${{ secrets.MASTODON_REDIRECT_URI }}
         run: |
           flutter pub get
-          echo "===== pubspec.lock DEPOIS do pub get ====="
-          grep -B2 -A5 "cached_video_player\|chewie" pubspec.lock || echo "NAO ENCONTRADO apos pub get"
-          echo "===== .flutter-plugins ====="
-          cat .flutter-plugins || echo "arquivo nao existe"
-          flutter build apk --debug \
+
+          # cached_video_player é puxado de forma transitiva (via wechat_assets_picker)
+          # e seu código Android está quebrado com qualquer ExoPlayer atual, sem versão
+          # antiga disponível pra baixar. O app não usa a pré-visualização de vídeo
+          # dentro do seletor de mídia, então removemos esse plugin dos arquivos que o
+          # Flutter usa pra decidir o que compilar/registrar no Android.
+          sed -i '/^cached_video_player=/d' .flutter-plugins || true
+
+          python3 - <<'PYEOF'
+import json
+path = ".flutter-plugins-dependencies"
+try:
+    with open(path) as f:
+        data = json.load(f)
+except FileNotFoundError:
+    data = None
+
+if data:
+    plugins = data.get("plugins", {})
+    for platform in list(plugins.keys()):
+        plugins[platform] = [p for p in plugins[platform] if p.get("name") != "cached_video_player"]
+    graph = data.get("dependencyGraph", [])
+    data["dependencyGraph"] = [d for d in graph if d.get("name") != "cached_video_player"]
+    for d in data["dependencyGraph"]:
+        d["dependencies"] = [dep for dep in d.get("dependencies", []) if dep != "cached_video_player"]
+    with open(path, "w") as f:
+        json.dump(data, f)
+    print("cached_video_player removido de .flutter-plugins-dependencies")
+else:
+    print(".flutter-plugins-dependencies nao encontrado, seguindo")
+PYEOF
+
+          flutter build apk --debug --no-pub \
             --dart-define=MASTODON_CLIENT_ID=$MASTODON_CLIENT_ID \
             --dart-define=MASTODON_CLIENT_SECRET=$MASTODON_CLIENT_SECRET \
             --dart-define=MASTODON_REDIRECT_URI=$MASTODON_REDIRECT_URI
