@@ -24,6 +24,12 @@ jobs:
           local-cache: true
       - name: Write local.properties
         run: echo "ndk.dir=${{ steps.setup-ndk.outputs.ndk-path }}" > android/local.properties
+      - name: Debug pubspec
+        run: |
+          echo "===== pubspec.yaml ====="
+          cat pubspec.yaml
+          echo "===== busca cached_video_player/chewie no pubspec.lock ====="
+          grep -B2 -A5 "cached_video_player\|chewie" pubspec.lock || echo "NAO ENCONTRADO no pubspec.lock"
       - name: Build
         env:
           MASTODON_CLIENT_ID: ${{ secrets.MASTODON_CLIENT_ID }}
