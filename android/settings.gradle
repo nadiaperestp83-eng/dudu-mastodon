@@ -8,7 +8,17 @@ if (pluginsFile.exists()) {
     pluginsFile.withReader('UTF-8') { reader -> plugins.load(reader) }
 }
 
+// cached_video_player é puxado de forma transitiva (via wechat_assets_picker),
+// mas o código Android dele está quebrado com ExoPlayer atual e não existe
+// mais nenhuma versão antiga disponível pra baixar. O app não usa a função
+// de pré-visualizar vídeo dentro do seletor de mídia, então pulamos só o
+// módulo Android desse plugin específico.
+def skippedPlugins = ['cached_video_player']
+
 plugins.each { name, path ->
+    if (skippedPlugins.contains(name)) {
+        return
+    }
     def pluginDirectory = flutterProjectRoot.resolve(path).resolve('android').toFile()
     include ":$name"
     project(":$name").projectDir = pluginDirectory
