@@ -37,6 +37,10 @@ jobs:
           MASTODON_REDIRECT_URI: ${{ secrets.MASTODON_REDIRECT_URI }}
         run: |
           flutter pub get
+          echo "===== pubspec.lock DEPOIS do pub get ====="
+          grep -B2 -A5 "cached_video_player\|chewie" pubspec.lock || echo "NAO ENCONTRADO apos pub get"
+          echo "===== .flutter-plugins ====="
+          cat .flutter-plugins || echo "arquivo nao existe"
           flutter build apk --debug \
             --dart-define=MASTODON_CLIENT_ID=$MASTODON_CLIENT_ID \
             --dart-define=MASTODON_CLIENT_SECRET=$MASTODON_CLIENT_SECRET \
