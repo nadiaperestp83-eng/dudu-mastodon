@@ -163,7 +163,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             ],
             index: homeTabIndex,
           ),
-          bottomNavigationBar: _bottomMenu(homeTabIndex, widget.logined)
+          bottomNavigationBar: widget.logined ? _bottomMenu(homeTabIndex, widget.logined) : null
           // Column(
           //   mainAxisSize: MainAxisSize.min,
           //   children: [
