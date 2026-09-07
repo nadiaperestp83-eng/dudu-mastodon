@@ -42,6 +42,7 @@ class _LoginState extends State<Login> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _startLogin());
   }
 
   // Monta o AppCredential com as chaves fixas (não registra mais via API)
@@ -78,6 +79,7 @@ class _LoginState extends State<Login> {
     );
 
     if (result == null) {
+      AppNavigate.pop();
       return;
     }
     setState(() {
@@ -189,93 +191,13 @@ class _LoginState extends State<Login> {
 
   @override
   Widget build(BuildContext context) {
-    return  isLoading ? loadView():
-    Scaffold(
+    return Scaffold(
       appBar: CustomAppBar(
         automaticallyImplyLeading: widget.showBackButton,
-          backgroundColor: Colors.transparent,
+        backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: null,
       ),
-        extendBodyBehindAppBar:true,
-            resizeToAvoidBottomPadding: false,
-        backgroundColor: Color.fromRGBO(0, 71, 122, 1),
-            body: GestureDetector(
-              behavior: HitTestBehavior.translucent,
-              onTap: () {
-                FocusScope.of(context).requestFocus(FocusNode());
-              },
-              child: Container(
-                child: Column(
-                  children: <Widget>[
-                    Container(
-                        height: 60,
-                        child: Padding(
-                          padding: EdgeInsets.only(top: 20),
-                          child: Center(
-                            child: Text('Mastodon',
-                                style: TextStyle(
-                                    fontSize: 20, )),
-                          ),
-                        )),
-                    Image.asset('assets/images/wallpaper.png'),
-                    Card(
-                      margin: EdgeInsets.fromLTRB(10, 0, 10, 0),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(2))),
-                      elevation: 5,
-                      child: Padding(
-                        padding: EdgeInsets.all(15),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Text(_hostUrl.replaceAll('https://', ''), style: TextStyle(fontSize: 16))
-                          ],
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(10),
-                      child: Row(
-                        children: <Widget>[
-                          Expanded(
-                            child: RaisedButton(
-                              onPressed: () {
-                                _startLogin();
-                              },
-                              child: Padding(
-                                padding: EdgeInsets.all(10),
-                                child: _showButtonLoading(context),
-                              ),
-                              color: Theme.of(context).primaryColor,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          GestureDetector(
-                            onTap: () {
-                              _showAboutSheet(context);
-                            },
-                            child: Container(
-                              child: Center(
-                                child: Text(S.of(context).about_mastodon,
-                                    style:
-                                        TextStyle(color: Theme.of(context).primaryColor)),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ));
+      body: LoadingView(text: S.of(context).loading),
+    );
   }
 }
