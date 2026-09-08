@@ -58,8 +58,9 @@ class StatusItemAccountW extends StatelessWidget {
                           text: StringUtil.displayName(status.account),
                           emojis: status.account.emojis,
                           style: TextStyle(
-                              fontSize: 13.5,
+                              fontSize: 14,
                               height: 1.1,
+                              fontWeight: FontWeight.w700, // nome em negrito (estilo Facebook)
                               color:
                                   Theme.of(context).textTheme.bodyText1.color)),
                       TextSpan(text: " ",style: TextStyle(height: 1)),
@@ -111,7 +112,7 @@ class StatusItemAccountW extends StatelessWidget {
             splashColor: Colors.transparent,
             padding: EdgeInsets.all(0),
             icon: Icon(
-              IconFont.expandMore,
+              IconFont.moreHoriz, // menu "..." estilo Facebook
               color: Theme.of(context).accentColor,
               size: 20,
             ),
