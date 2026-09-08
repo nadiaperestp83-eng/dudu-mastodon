@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:dudu/api/accounts_api.dart';
 import 'package:dudu/constant/icon_font.dart';
+import 'package:dudu/constant/fb_colors.dart';
 import 'package:dudu/l10n/l10n.dart';
 import 'package:dudu/models/json_serializable/media_attachment.dart';
 import 'package:dudu/models/json_serializable/owner_account.dart';
@@ -433,58 +434,20 @@ class _UserProfileState extends State<UserProfile>
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-                          SizedBox(height: 10),
-                          Row(
-                            children: <Widget>[
-                              Spacer(),
-                              if (relationShip != null && relationShip.muting)
-                                IconButton(
-                                  icon: Icon(IconFont.volumeUp),
-                                  onPressed: _onPressUnmute,
-                                ),
-                              Visibility(
-                                visible: relationShip != null,
-                                maintainSize: true,
-                                maintainAnimation: true,
-                                maintainState: true,
-                                child: RaisedButton(
-                                  textColor: Colors.white,
-                                  child: Text(relationShip == null
-                                      ? 'whatever'
-                                      : mine.account.id == _account.id
-                                          ? S.of(context).edit_information
-                                          : relationShip.blocking
-                                              ? S.of(context).unblock
-                                              : relationShip.requested
-                                                  ? S
-                                                      .of(context)
-                                                      .follow_request_sent
-                                                  : relationShip.following
-                                                      ? S
-                                                          .of(context)
-                                                          .unsubscribe
-                                                      : S
-                                                          .of(context)
-                                                          .attention),
-                                  onPressed: _onPressButton,
-                                ),
-                              )
-                            ],
-                          ),
-                          SizedBox(
-                            height: 20,
-                          ),
+                          // Espaço para a foto de perfil circular, que fica
+                          // sobreposta (Positioned) por cima deste bloco.
+                          SizedBox(height: 66),
                           if (_account != null) ...[
-                            TextWithEmoji(
-                              text: StringUtil.displayName(_account),
-                              emojis: _account.emojis,
-                              style: TextStyle(
-                                  //     fontWeight: FontWeight.bold,
-                                  color: Theme.of(context)
-                                      .textTheme
-                                      .bodyText1
-                                      .color,
-                                  fontSize: 18),
+                            // Nome e @usuário centralizados, estilo Facebook.
+                            Center(
+                              child: TextWithEmoji(
+                                text: StringUtil.displayName(_account),
+                                emojis: _account.emojis,
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w700,
+                                    color: FbColors.textPrimary,
+                                    fontSize: 20),
+                              ),
                             ),
                             MediaQuery(
                               data: MediaQuery.of(context).copyWith(
@@ -492,10 +455,13 @@ class _UserProfileState extends State<UserProfile>
                                       SettingsProvider.getWithCurrentContext(
                                           'text_scale'))),
                               child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Text(
                                     '@' + _account.acct,
-                                    style: TextStyle(fontSize: 16),
+                                    style: TextStyle(
+                                        fontSize: 15,
+                                        color: FbColors.textSecondary),
                                   ),
                                   SizedBox(
                                     width: 3,
@@ -514,13 +480,16 @@ class _UserProfileState extends State<UserProfile>
                             Visibility(
                               visible: relationShip != null &&
                                   relationShip.followedBy,
-                              child: Container(
-                                  padding: EdgeInsets.all(3),
-                                  margin: EdgeInsets.only(top: 5),
-                                  decoration: BoxDecoration(
-                                      border: Border.all(),
-                                      borderRadius: BorderRadius.circular(12)),
-                                  child: Text(S.of(context).followed_you)),
+                              child: Center(
+                                child: Container(
+                                    padding: EdgeInsets.all(3),
+                                    margin: EdgeInsets.only(top: 5),
+                                    decoration: BoxDecoration(
+                                        border: Border.all(),
+                                        borderRadius:
+                                            BorderRadius.circular(12)),
+                                    child: Text(S.of(context).followed_you)),
+                              ),
                             ),
                             SizedBox(
                               height: 10,
@@ -549,6 +518,68 @@ class _UserProfileState extends State<UserProfile>
                                       color: Theme.of(context).accentColor),
                                 ),
                               ),
+                            // Botão largo e azul (estilo Facebook),
+                            // substitui a antiga lista simples de ação.
+                            Visibility(
+                              visible: relationShip != null,
+                              maintainSize: true,
+                              maintainAnimation: true,
+                              maintainState: true,
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 10),
+                                child: Row(
+                                  children: [
+                                    if (relationShip != null &&
+                                        relationShip.muting)
+                                      IconButton(
+                                        icon: Icon(IconFont.volumeUp),
+                                        onPressed: _onPressUnmute,
+                                      ),
+                                    Expanded(
+                                      child: SizedBox(
+                                        height: 42,
+                                        child: RaisedButton(
+                                          color: FbColors.primaryBlue,
+                                          elevation: 0,
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(8)),
+                                          textColor: Colors.white,
+                                          child: Text(
+                                            relationShip == null
+                                                ? 'whatever'
+                                                : mine.account.id ==
+                                                        _account.id
+                                                    ? S
+                                                        .of(context)
+                                                        .edit_information
+                                                    : relationShip.blocking
+                                                        ? S.of(context).unblock
+                                                        : relationShip
+                                                                .requested
+                                                            ? S
+                                                                .of(context)
+                                                                .follow_request_sent
+                                                            : relationShip
+                                                                    .following
+                                                                ? S
+                                                                    .of(context)
+                                                                    .unsubscribe
+                                                                : S
+                                                                    .of(context)
+                                                                    .attention,
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.w700),
+                                          ),
+                                          onPressed: _onPressButton,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
                             headerFollowsAndFollowers()
                           ],
                           SizedBox(
@@ -559,39 +590,43 @@ class _UserProfileState extends State<UserProfile>
                     )
                   ],
                 ),
+                // Foto de perfil circular sobreposta na borda inferior da
+                // capa (metade na capa, metade no fundo branco), centralizada,
+                // com borda branca grossa - estilo Facebook.
                 Positioned(
                     top: 150,
-                    left: 20,
-                    child: GestureDetector(
-                      behavior: HitTestBehavior.translucent,
-                      onTap: () => AppNavigate.push(
-                          PhotoGallery(
-                            galleryItems: [
-                              MediaAttachment.fromJson({
-                                'url': _account.avatar,
-                                'preview_url': _account.avatar,
-                                'id': 'user_avatar'
-                              })
-                            ],
-                            initialIndex: 0,
+                    left: 0,
+                    right: 0,
+                    child: Center(
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.translucent,
+                        onTap: () => AppNavigate.push(
+                            PhotoGallery(
+                              galleryItems: [
+                                MediaAttachment.fromJson({
+                                  'url': _account.avatar,
+                                  'preview_url': _account.avatar,
+                                  'id': 'user_avatar'
+                                })
+                              ],
+                              initialIndex: 0,
+                            ),
+                            routeType: RouterType.fade),
+                        child: Container(
+                          width: 104,
+                          height: 104,
+                          decoration: BoxDecoration(
+                            border: Border.all(width: 4, color: Colors.white),
+                            shape: BoxShape.circle,
                           ),
-                          routeType: RouterType.fade),
-                      child: Container(
-                        width: 100,
-                        height: 100,
-                        decoration: BoxDecoration(
-                          border: Border.all(width: 4, color: Colors.white),
-                          borderRadius:
-                              new BorderRadius.all(Radius.circular(14.0)),
-                          shape: BoxShape.rectangle,
-                        ),
-                        child: Hero(
-                          tag: 'user_avatar',
-                          child: Avatar(
-                            width: 100,
-                            height: 100,
-                            navigateToDetail: false,
-                            account: _account,
+                          child: Hero(
+                            tag: 'user_avatar',
+                            child: Avatar(
+                              width: 96,
+                              height: 96,
+                              navigateToDetail: false,
+                              account: _account,
+                            ),
                           ),
                         ),
                       ),
@@ -646,73 +681,46 @@ class _UserProfileState extends State<UserProfile>
     return false;
   }
 
-  Widget headerFollowsAndFollowers() {
-    return DefaultTextStyle(
-      style: TextStyle(
-          // fontWeight: FontWeight.bold,
-          fontSize: 16,
-          color: Theme.of(context).accentColor),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: <Widget>[
-          InkWell(
-            onTap: () => _tabController.animateTo(0),
-            child: Row(
-              children: <Widget>[
-                Text(_account.statusesCount.toString()),
-                SizedBox(
-                  width: 1,
-                ),
-                Text(S.of(context).toot),
-              ],
-            ),
-          ),
-          SizedBox(
-            width: 10,
-          ),
-          //   Text('|'),
-          SizedBox(
-            width: 10,
-          ),
-          InkWell(
-            onTap: () async {
-              if (widget.hostUrl != null) return null;
-              AppNavigate.push(UserFollowing(_account.id));
-            },
-            child: Row(
-              children: <Widget>[
-                Text(_account.followingCount.toString()),
-                SizedBox(
-                  width: 1,
-                ),
-                Text(S.of(context).attention),
-              ],
-            ),
-          ),
-          SizedBox(
-            width: 10,
-          ),
-          //   Text('|'),
-          SizedBox(
-            width: 10,
-          ),
-          InkWell(
-            onTap: () async {
-              if (widget.hostUrl != null) return;
-              AppNavigate.push(UserFollowers(_account.id));
-            },
-            child: Row(
-              children: <Widget>[
-                Text(_account.followersCount.toString()),
-                SizedBox(
-                  width: 1,
-                ),
-                Text(S.of(context).fans),
-              ],
-            ),
-          )
-        ],
+  // Barra limpa e centralizada com os contadores de publicações,
+  // seguindo e seguidores - estilo Facebook.
+  Widget _statCounter(String count, String label, VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+        child: Column(
+          children: [
+            Text(count,
+                style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 16,
+                    color: FbColors.textPrimary)),
+            Text(label,
+                style: TextStyle(
+                    fontSize: 13, color: FbColors.textSecondary)),
+          ],
+        ),
       ),
+    );
+  }
+
+  Widget headerFollowsAndFollowers() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        _statCounter(_account.statusesCount.toString(), S.of(context).toot,
+            () => _tabController.animateTo(0)),
+        _statCounter(_account.followingCount.toString(),
+            S.of(context).attention, () async {
+          if (widget.hostUrl != null) return null;
+          AppNavigate.push(UserFollowing(_account.id));
+        }),
+        _statCounter(_account.followersCount.toString(), S.of(context).fans,
+            () async {
+          if (widget.hostUrl != null) return;
+          AppNavigate.push(UserFollowers(_account.id));
+        }),
+      ],
     );
   }
 
