@@ -1,4 +1,5 @@
 import 'package:dudu/constant/icon_font.dart';
+import 'package:dudu/constant/fb_colors.dart';
 import 'package:dudu/l10n/l10n.dart';
 import 'package:dudu/models/json_serializable/article_item.dart';
 import 'package:dudu/models/provider/settings_provider.dart';
@@ -124,7 +125,7 @@ class StatusItemActionW extends StatelessWidget {
                           style: TextStyle(
                               fontSize: fontSize - 1,
                               color: isLiked != null && isLiked
-                                  ? Colors.blue[800]
+                                  ? FbColors.primaryBlue
                                   : Theme.of(context).accentColor));
                 },
                 countDecoration: (Widget count, int likeCount) {
@@ -138,7 +139,7 @@ class StatusItemActionW extends StatelessWidget {
                         style: TextStyle(
                             fontSize: fontSize,
                             color: status.reblogged != null && status.reblogged
-                                ? Colors.blue[800]
+                                ? FbColors.primaryBlue
                                 : Theme.of(context).accentColor),
                       ),
                       SizedBox(
@@ -152,7 +153,7 @@ class StatusItemActionW extends StatelessWidget {
                   return isLiked != null && isLiked
                       ? Icon(
                           IconFont.reblog,
-                          color: Colors.blue[800],
+                          color: FbColors.primaryBlue,
                           size: iconSize,
                         )
                       : Icon(
@@ -185,7 +186,7 @@ class StatusItemActionW extends StatelessWidget {
                         style: TextStyle(
                             fontSize: fontSize - 1,
                             color: isLiked != null && isLiked
-                                ? Colors.yellow[800]
+                                ? FbColors.primaryBlue
                                 : color));
               },
               countDecoration: (Widget count, int likeCount) {
@@ -199,7 +200,7 @@ class StatusItemActionW extends StatelessWidget {
                       style: TextStyle(
                           fontSize: fontSize,
                           color: status.favourited != null && status.favourited
-                              ? Colors.yellow[800]
+                              ? FbColors.primaryBlue
                               : Theme.of(context).accentColor),
                     ),
                     SizedBox(
@@ -213,7 +214,7 @@ class StatusItemActionW extends StatelessWidget {
                 return isLiked
                     ? Icon(
                         zan_icon,
-                        color: Colors.yellow[800],
+                        color: FbColors.primaryBlue,
                         size: iconSize,
                       )
                     : Icon(
