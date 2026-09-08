@@ -82,11 +82,20 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   // Aba "Discover" (instâncias) removida da navegação.
-  List<IconData> _tabIcons = [
-    IconFont.home,
-    IconFont.local,
-    IconFont.notification,
-    IconFont.mine
+  // Ícones estilo Facebook: contorno quando inativo, preenchido e azul
+  // quando ativo (Material Icons, para ter as duas variantes prontas).
+  List<IconData> _tabIconsOutline = [
+    Icons.home_outlined,
+    Icons.groups_outlined,
+    Icons.notifications_outlined,
+    Icons.person_outline,
+  ];
+
+  List<IconData> _tabIconsFilled = [
+    Icons.home,
+    Icons.groups,
+    Icons.notifications,
+    Icons.person,
   ];
 
   List<String> get _tabTitles {
@@ -101,16 +110,16 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   Icon getTabIcon(int index, Color activeColor, bool logined) {
     if (index == SettingsProvider().homeTabIndex) {
       return Icon(
-        _tabIcons[index],
+        _tabIconsFilled[index],
         color: activeColor,
-        size: 28,
+        size: 26,
       ); //_tabSelectedImages[index];
     } else {
       return Icon(
-        _tabIcons[index],
+        _tabIconsOutline[index],
         color:
             logined ? Theme.of(context).textTheme.bodyText2.color : Colors.grey,
-        size: 28,
+        size: 26,
       ); //_tabImages[index];
     }
   }
@@ -120,7 +129,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       return Text(
         _tabTitles[index],
         style: TextStyle(
-            color: activeColor, fontWeight: FontWeight.normal, fontSize: 10),
+            color: activeColor, fontWeight: FontWeight.w600, fontSize: 10),
       );
     } else {
       return Text(
