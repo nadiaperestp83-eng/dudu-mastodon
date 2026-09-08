@@ -48,7 +48,7 @@ class SettingsProvider extends ChangeNotifier {
 
   LoginedUser currentUser;
 
-  int homeTabIndex = 2;
+  int homeTabIndex = 0;
   int publicTabIndex = 0;
 
   Map<String, List<FilterItem>> filters = {
@@ -84,7 +84,8 @@ class SettingsProvider extends ChangeNotifier {
         'mention',
         'poll'
       ],
-      'language': ['zh', 'en', 'fr', 'ru', 'ar', 'es', 'ja'].contains(langCode)
+      'language': ['zh', 'en', 'fr', 'ru', 'ar', 'es', 'ja', 'de', 'pt']
+              .contains(langCode)
           ? langCode
           : 'en',
       'translate_engine': Platform.localeName.startsWith('zh') ? '1' : '0',
@@ -92,7 +93,7 @@ class SettingsProvider extends ChangeNotifier {
     };
     LoginedUser user = LoginedUser();
     if (user.account == null) {
-      homeTabIndex = 2;
+      homeTabIndex = 0;
       notifyListeners();
       return;
     } else {
