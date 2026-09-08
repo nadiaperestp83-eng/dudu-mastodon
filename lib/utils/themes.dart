@@ -1,31 +1,54 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:dudu/constant/fb_colors.dart';
 
 class ThemeUtil {
+  // Design system "Facebook": tipografia Roboto (google_fonts) + paleta
+  // azul #1877F2 / fundo cinza-gelo #F0F2F5 / texto grafite #050505.
   static ThemeData lightTheme() {
+    final baseTextTheme = GoogleFonts.robotoTextTheme(ThemeData.light().textTheme);
     return ThemeData(
-      primaryColor: Colors.white,
-      toggleableActiveColor: Colors.blue,
-      appBarTheme:
-          AppBarTheme(elevation: 1.0, color: Color.fromRGBO(252, 252, 252, 1),textTheme: TextTheme(
-            headline6: TextStyle(fontSize: 18,color: Colors.black)
-          )),
-      dialogTheme: DialogTheme(),
-      popupMenuTheme: PopupMenuThemeData(color: Color.fromRGBO(238, 238, 238, 1)),
-      inputDecorationTheme:
-          InputDecorationTheme(fillColor: Color.fromRGBO(240, 240, 240, 1)),
-      backgroundColor: Color.fromRGBO(238, 238, 238, 1),
-      buttonColor: Colors.blue,
-      textTheme: TextTheme(
-        headline5: TextStyle(color: Color.fromRGBO(68, 75, 91, 1))
+      fontFamily: GoogleFonts.roboto().fontFamily,
+      primaryColor: FbColors.cardBackground, // fundo branco dos "cards"
+      toggleableActiveColor: FbColors.primaryBlue,
+      appBarTheme: AppBarTheme(
+        elevation: 0.5,
+        color: FbColors.cardBackground,
+        brightness: Brightness.light,
+        iconTheme: IconThemeData(color: FbColors.textPrimary),
+        textTheme: TextTheme(
+            headline6: GoogleFonts.roboto(
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                color: FbColors.primaryBlue)),
       ),
-      bottomSheetTheme: BottomSheetThemeData(backgroundColor: Colors.white),
+      dialogTheme: DialogTheme(),
+      popupMenuTheme:
+          PopupMenuThemeData(color: FbColors.cardBackground),
+      inputDecorationTheme:
+          InputDecorationTheme(fillColor: FbColors.background),
+      backgroundColor: FbColors.background,
+      buttonColor: FbColors.primaryBlue,
+      textTheme: baseTextTheme.copyWith(
+        headline5: GoogleFonts.roboto(color: FbColors.textSecondary),
+        bodyText1: GoogleFonts.roboto(color: FbColors.textPrimary),
+        bodyText2: GoogleFonts.roboto(color: FbColors.textSecondary),
+        subtitle1: GoogleFonts.roboto(color: FbColors.textSecondary),
+      ),
+      bottomSheetTheme:
+          BottomSheetThemeData(backgroundColor: FbColors.cardBackground),
       splashColor: Colors.transparent,
-      accentColor: Colors.grey[600],
-      bottomAppBarColor: Color.fromRGBO(246, 246, 246, 1),
-      scaffoldBackgroundColor: Color.fromRGBO(238, 238, 238, 1),
+      accentColor: FbColors.textSecondary,
+      bottomAppBarColor: FbColors.cardBackground,
+      scaffoldBackgroundColor: FbColors.background,
+      cardColor: FbColors.cardBackground,
+      dividerColor: FbColors.divider,
       buttonTheme: ButtonThemeData(
-        buttonColor: Colors.blue,
+        buttonColor: FbColors.primaryBlue,
         textTheme: ButtonTextTheme.primary,
+      ),
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
+        backgroundColor: FbColors.primaryBlue,
       ),
     );
   }
