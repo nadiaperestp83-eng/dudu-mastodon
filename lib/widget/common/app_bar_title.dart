@@ -6,8 +6,17 @@ class DropDownTitle extends StatelessWidget {
   final bool showIcon;
   final bool iconMaintainSize;
   final Color fontColor;
+  final FontWeight fontWeight;
+  final double fontSize;
 
-  DropDownTitle({this.title, this.expand = false, this.showIcon = false, this.iconMaintainSize = true,this.fontColor});
+  DropDownTitle(
+      {this.title,
+      this.expand = false,
+      this.showIcon = false,
+      this.iconMaintainSize = true,
+      this.fontColor,
+      this.fontWeight = FontWeight.normal,
+      this.fontSize = 17});
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +28,8 @@ class DropDownTitle extends StatelessWidget {
         children: [
           Text(
             title,
-            style: TextStyle(fontSize: 17,color: fontColor),
+            style: TextStyle(
+                fontSize: fontSize, color: fontColor, fontWeight: fontWeight),
           ),
           Visibility(
               maintainSize: iconMaintainSize,
