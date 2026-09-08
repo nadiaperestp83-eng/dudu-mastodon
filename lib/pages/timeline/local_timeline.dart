@@ -1,6 +1,7 @@
 import 'package:dudu/api/timeline_api.dart';
-import 'package:dudu/constant/icon_font.dart';
+import 'package:dudu/constant/fb_colors.dart';
 import 'package:dudu/l10n/l10n.dart';
+import 'package:dudu/models/provider/settings_provider.dart';
 import 'package:dudu/pages/search/search_page_delegate.dart';
 import 'package:dudu/pages/status/new_status.dart';
 import 'package:dudu/utils/app_navigate.dart';
@@ -39,9 +40,10 @@ class _HomeTimelineState extends State<HomeTimeline> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(
-        centerTitle: true,
+        centerTitle: false,
         automaticallyImplyLeading: false,
         key: _headerKey,
+        // Logo do app em azul e negrito à esquerda, estilo Facebook.
         title: MKDropDownMenu(
           controller: _downMenuController,
           headerBuilder: (menuShowing) {
@@ -49,6 +51,9 @@ class _HomeTimelineState extends State<HomeTimeline> {
               title: S.of(context).home,
               expand: menuShowing,
               showIcon: true,
+              fontColor: FbColors.primaryBlue,
+              fontWeight: FontWeight.w800,
+              fontSize: 22,
             );
           },
           headerKey: _headerKey,
@@ -57,32 +62,62 @@ class _HomeTimelineState extends State<HomeTimeline> {
           },
         ),
         actions: [
-          IconButton(
-            icon: Icon(
-              IconFont.search,
-              size: 26,
-            ),
-            onPressed: () {
+          _FbIconChip(
+            icon: Icons.search,
+            onTap: () {
               OverlayUtil.hideAllOverlay();
               customSearch.showSearch(
                   context: context, delegate: SearchPageDelegate());
             },
           ),
-          IconButton(
-              icon: Icon(
-                IconFont.follow,
-                //  color: Theme.of(context).buttonColor,
-                size: 26,
-              ),
-              onPressed: () {
-                OverlayUtil.hideAllOverlay();
-                AppNavigate.push(NewStatus(), routeType: RouterType.material);
-              })
+          SizedBox(width: 8),
+          _FbIconChip(
+            icon: Icons.notifications_outlined,
+            onTap: () {
+              OverlayUtil.hideAllOverlay();
+              SettingsProvider().setHomeTabIndex(2);
+            },
+          ),
+          SizedBox(width: 8),
+          _FbIconChip(
+            icon: Icons.add,
+            onTap: () {
+              OverlayUtil.hideAllOverlay();
+              AppNavigate.push(NewStatus(), routeType: RouterType.material);
+            },
+          ),
+          SizedBox(width: 8),
         ],
       ),
       body: TimelineContent(
         url: TimelineApi.home,
         tag: 'home',
+      ),
+    );
+  }
+}
+
+/// Botão de atalho circular com fundo cinza-claro, no estilo dos ícones
+/// de "pesquisa" e "notificações" da AppBar do Facebook.
+class _FbIconChip extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback onTap;
+
+  const _FbIconChip({Key key, this.icon, this.onTap}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      customBorder: CircleBorder(),
+      onTap: onTap,
+      child: Container(
+        width: 36,
+        height: 36,
+        decoration: BoxDecoration(
+          color: FbColors.iconChipBackground,
+          shape: BoxShape.circle,
+        ),
+        child: Icon(icon, size: 20, color: FbColors.textPrimary),
       ),
     );
   }
