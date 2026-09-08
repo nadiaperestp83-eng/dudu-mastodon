@@ -8,7 +8,6 @@ import 'package:dudu/models/task/get_emoji_task.dart';
 import 'package:dudu/models/task/notification_task.dart';
 import 'package:dudu/models/task/register_help_task.dart';
 import 'package:dudu/models/task/update_task.dart';
-import 'package:dudu/pages/discovery/instance_list.dart';
 import 'package:dudu/pages/timeline/local_timeline.dart';
 import 'package:dudu/pages/timeline/notification_timeline.dart';
 import 'package:dudu/pages/timeline/public_timeline.dart';
@@ -82,10 +81,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     super.dispose();
   }
 
+  // Aba "Discover" (instâncias) removida da navegação.
   List<IconData> _tabIcons = [
     IconFont.home,
     IconFont.local,
-    IconFont.earth,
     IconFont.notification,
     IconFont.mine
   ];
@@ -94,7 +93,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     return [
       S.of(context).home,
       S.of(context).square,
-      S.of(context).find,
       S.of(context).news,
       S.of(context).me
     ];
@@ -157,7 +155,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                           .startsWith('https://help.dudu.today'),
                     )
                   : Container(),
-              InstanceList(),
               widget.logined ? NotificationTimeline() : Container(),
               widget.logined ? Setting() : Container()
             ],
@@ -318,16 +315,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                       : null,
                 ),
                 BottomNaviBar(
-                  showBadge: false,
                   icon: getTabIcon(2, activeColor, logined),
                   title: getTabTitle(2, activeColor, logined),
-                  onTap: () {
-                    SettingsProvider().setHomeTabIndex(2);
-                  },
-                ),
-                BottomNaviBar(
-                  icon: getTabIcon(3, activeColor, logined),
-                  title: getTabTitle(3, activeColor, logined),
                   showBadge: showBadge &&
                       logined &&
                       ( //provider.unread[TimelineApi.notification] != 0 ||
@@ -344,13 +333,13 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                                   0),
                   onTap: logined
                       ? () {
-                          if (_tabIndex == 3) {
+                          if (_tabIndex == 2) {
                             // provider.notificationProvider.scrollController.jumpTo(0);
                             provider.notificationProvider.refreshController
                                 .requestRefresh(
                                     duration: Duration(milliseconds: 100));
                           } else {
-                            SettingsProvider().setHomeTabIndex(3);
+                            SettingsProvider().setHomeTabIndex(2);
                           }
                         }
                       : () => DialogUtils.showInfoDialog(
@@ -365,15 +354,15 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 ),
                 BottomNaviBar(
                   showBadge: false,
-                  icon: getTabIcon(4, activeColor, logined),
-                  title: getTabTitle(4, activeColor, logined),
+                  icon: getTabIcon(3, activeColor, logined),
+                  title: getTabTitle(3, activeColor, logined),
                   onTap: logined
                       ? () {
-                          if (_tabIndex == 4) {
+                          if (_tabIndex == 3) {
                             SettingsProvider().settingController.requestRefresh(
                                 duration: Duration(milliseconds: 100));
                           } else {
-                            SettingsProvider().setHomeTabIndex(4);
+                            SettingsProvider().setHomeTabIndex(3);
                           }
                         }
                       : () => DialogUtils.showInfoDialog(
