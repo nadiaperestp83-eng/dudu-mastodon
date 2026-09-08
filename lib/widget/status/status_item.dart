@@ -115,10 +115,21 @@ class StatusItem extends StatelessWidget {
       ]);
     } else {
       StatusItemData data = item.reblog ?? item;
+      // Card estilo Facebook: bloco branco flutuante com cantos
+      // arredondados e leve sombra, separado do próximo post por uma
+      // margem (em vez da antiga linha divisória contínua).
       return Column(children: [
-        Material(
-          color: Theme.of(context).primaryColor,
-          child: InkWell(
+        Container(
+          margin: EdgeInsets.symmetric(
+              horizontal: primary ? 0 : 8, vertical: primary ? 0 : 4),
+          child: Material(
+            color: Theme.of(context).primaryColor,
+            elevation: primary ? 0 : 0.6,
+            shadowColor: Colors.black26,
+            borderRadius:
+                primary ? BorderRadius.zero : BorderRadius.circular(12),
+            clipBehavior: Clip.antiAlias,
+            child: InkWell(
             onTap: primary ? null : () => _onStatusClicked(context, false),
             // onLongPress: () =>
             //     StatusActionUtil.showBottomSheetAction(context, data, subStatus),
@@ -157,6 +168,7 @@ class StatusItem extends StatelessWidget {
                 ],
               ),
             ),
+            ),
           ),
         ),
         if (lineDivider)
@@ -165,7 +177,7 @@ class StatusItem extends StatelessWidget {
           )
         else
           SizedBox(
-            height: 8,
+            height: primary ? 8 : 2, // o card já tem margem própria
           )
       ]);
     }
