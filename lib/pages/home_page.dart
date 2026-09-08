@@ -86,14 +86,14 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   // quando ativo (Material Icons, para ter as duas variantes prontas).
   List<IconData> _tabIconsOutline = [
     Icons.home_outlined,
-    Icons.groups_outlined,
+    Icons.people_outline,
     Icons.notifications_outlined,
     Icons.person_outline,
   ];
 
   List<IconData> _tabIconsFilled = [
     Icons.home,
-    Icons.groups,
+    Icons.people,
     Icons.notifications,
     Icons.person,
   ];
