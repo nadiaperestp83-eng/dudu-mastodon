@@ -10,6 +10,7 @@ import 'package:provider/provider.dart';
 
 import 'models/logined_user.dart';
 import 'pages/home_page.dart';
+import 'pages/login/login.dart';
 
 LoginedUser user = new LoginedUser();
 
@@ -63,6 +64,7 @@ class App extends StatelessWidget {
         const Locale('es', ''),
         const Locale('ja', ''),
         const Locale('de', ''),
+        const Locale('pt', ''),
         // ... other locales the app supports
       ],
       theme: ThemeUtil.themes[chooseTheme],
@@ -83,6 +85,11 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Sem login: vai direto para a tela de Login, sem barra de navegação.
+    // A aba "Discover" (instâncias) foi removida do app.
+    if (!logined) {
+      return Login();
+    }
     return Scaffold(
         body: HomePage(
       logined: logined,
