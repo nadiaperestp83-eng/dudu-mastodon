@@ -123,8 +123,11 @@ class _AccountSwitchState extends State<AccountSwitch> {
                       if (!manageMode)
                         InkWell(
                           onTap: () {
-                            SettingsProvider().setHomeTabIndex(2);
-                            AppNavigate.popToRoot();
+                            AppNavigate.push(
+                                Login(
+                                  showBackButton: true,
+                                ),
+                                routeType: RouterType.material);
                           },
                           child: Ink(
                             padding: EdgeInsets.all(25),
