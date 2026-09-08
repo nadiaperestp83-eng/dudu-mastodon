@@ -31,12 +31,11 @@ class AccountListHeader extends StatelessWidget {
               InkWell(
                 onTap: () {
                   controller.hideMenu();
-                  SettingsProvider().setHomeTabIndex(2);
-                  // AppNavigate.push(
-                  //     Login(
-                  //       showBackButton: true,
-                  //     ),
-                  //     routeType: RouterType.material);
+                  AppNavigate.push(
+                      Login(
+                        showBackButton: true,
+                      ),
+                      routeType: RouterType.material);
                 },
                 child: Container(
                   height: 50,
@@ -58,5 +57,4 @@ class AccountListHeader extends StatelessWidget {
     );
   }
 }
-
 
