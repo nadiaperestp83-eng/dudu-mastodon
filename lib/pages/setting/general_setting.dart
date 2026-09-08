@@ -4,7 +4,7 @@ import 'package:dudu/models/instance/instance_manager.dart';
 import 'package:dudu/models/local_account.dart';
 import 'package:dudu/models/logined_user.dart';
 import 'package:dudu/models/provider/settings_provider.dart';
-import 'package:dudu/pages/home_page.dart';
+import 'package:dudu/pages/login/login.dart';
 import 'package:dudu/pages/setting/about_app.dart';
 import 'package:dudu/pages/setting/account_switch.dart';
 import 'package:dudu/pages/setting/setting_content.dart';
@@ -76,11 +76,9 @@ class _GeneralSettingState extends State<GeneralSetting> {
     if (LocalStorageAccount.accounts.isNotEmpty) {
       AccountUtil.switchToAccount(LocalStorageAccount.accounts[0]);
     } else {
-      SettingsProvider().setHomeTabIndex(2);
+      SettingsProvider().setHomeTabIndex(0);
       SettingsProvider().setCurrentUser(null);
-      AppNavigate.pushAndRemoveUntil(HomePage(
-        logined: false,
-      ));
+      AppNavigate.pushAndRemoveUntil(Login());
     }
   }
 
@@ -108,7 +106,7 @@ class _GeneralSettingState extends State<GeneralSetting> {
             providerKey: 'language',
             leftIcon: Icon(IconFont.earth),
             title: S.of(context).language,
-            options: ['zh', 'en', 'fr', 'ru', 'ar', 'es', 'ja', 'de'],
+            options: ['zh', 'en', 'fr', 'ru', 'ar', 'es', 'ja', 'de', 'pt'],
             displayOptions: [
               '中文',
               'English',
@@ -117,7 +115,8 @@ class _GeneralSettingState extends State<GeneralSetting> {
               'العربية',
               '	Español',
               '日本語',
-              'German'
+              'German',
+              'Português'
             ],
             type: SettingType.string,
           ),
