@@ -438,16 +438,14 @@ class _UserProfileState extends State<UserProfile>
                           // sobreposta (Positioned) por cima deste bloco.
                           SizedBox(height: 66),
                           if (_account != null) ...[
-                            // Nome e @usuário centralizados, estilo Facebook.
-                            Center(
-                              child: TextWithEmoji(
-                                text: StringUtil.displayName(_account),
-                                emojis: _account.emojis,
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w700,
-                                    color: FbColors.textPrimary,
-                                    fontSize: 20),
-                              ),
+                            // Nome e @usuário alinhados à esquerda (estilo Facebook).
+                            TextWithEmoji(
+                              text: StringUtil.displayName(_account),
+                              emojis: _account.emojis,
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  color: FbColors.textPrimary,
+                                  fontSize: 22),
                             ),
                             MediaQuery(
                               data: MediaQuery.of(context).copyWith(
@@ -455,7 +453,6 @@ class _UserProfileState extends State<UserProfile>
                                       SettingsProvider.getWithCurrentContext(
                                           'text_scale'))),
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Text(
                                     '@' + _account.acct,
@@ -480,28 +477,24 @@ class _UserProfileState extends State<UserProfile>
                             Visibility(
                               visible: relationShip != null &&
                                   relationShip.followedBy,
-                              child: Center(
-                                child: Container(
-                                    padding: EdgeInsets.all(3),
-                                    margin: EdgeInsets.only(top: 5),
-                                    decoration: BoxDecoration(
-                                        border: Border.all(),
-                                        borderRadius:
-                                            BorderRadius.circular(12)),
-                                    child: Text(S.of(context).followed_you)),
-                              ),
+                              child: Container(
+                                  padding: EdgeInsets.all(3),
+                                  margin: EdgeInsets.only(top: 5),
+                                  decoration: BoxDecoration(
+                                      border: Border.all(),
+                                      borderRadius:
+                                          BorderRadius.circular(12)),
+                                  child: Text(S.of(context).followed_you)),
                             ),
                             SizedBox(
                               height: 10,
                             ),
                             Container(
                                 width: ScreenUtil.width(context) - 60,
-                                child: Center(
-                                  child: HtmlContent(
-                                    _account.note,
-                                    emojis: _account.emojis,
-                                    foldConetent: false,
-                                  ),
+                                child: HtmlContent(
+                                  _account.note,
+                                  emojis: _account.emojis,
+                                  foldConetent: false,
                                 )),
                             headerFields(),
                             SizedBox(
@@ -591,45 +584,71 @@ class _UserProfileState extends State<UserProfile>
                   ],
                 ),
                 // Foto de perfil circular sobreposta na borda inferior da
-                // capa (metade na capa, metade no fundo branco), centralizada,
-                // com borda branca grossa - estilo Facebook.
+                // capa (metade na capa, metade no fundo branco), alinhada
+                // à esquerda, com borda branca grossa - estilo Facebook.
                 Positioned(
-                    top: 150,
-                    left: 0,
-                    right: 0,
-                    child: Center(
-                      child: GestureDetector(
-                        behavior: HitTestBehavior.translucent,
-                        onTap: () => AppNavigate.push(
-                            PhotoGallery(
-                              galleryItems: [
-                                MediaAttachment.fromJson({
-                                  'url': _account.avatar,
-                                  'preview_url': _account.avatar,
-                                  'id': 'user_avatar'
-                                })
-                              ],
-                              initialIndex: 0,
+                    top: 140,
+                    left: 16,
+                    child: Stack(
+                      overflow: Overflow.visible,
+                      children: [
+                        GestureDetector(
+                          behavior: HitTestBehavior.translucent,
+                          onTap: () => AppNavigate.push(
+                              PhotoGallery(
+                                galleryItems: [
+                                  MediaAttachment.fromJson({
+                                    'url': _account.avatar,
+                                    'preview_url': _account.avatar,
+                                    'id': 'user_avatar'
+                                  })
+                                ],
+                                initialIndex: 0,
+                              ),
+                              routeType: RouterType.fade),
+                          child: Container(
+                            width: 104,
+                            height: 104,
+                            decoration: BoxDecoration(
+                              border:
+                                  Border.all(width: 4, color: Colors.white),
+                              shape: BoxShape.circle,
                             ),
-                            routeType: RouterType.fade),
-                        child: Container(
-                          width: 104,
-                          height: 104,
-                          decoration: BoxDecoration(
-                            border: Border.all(width: 4, color: Colors.white),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Hero(
-                            tag: 'user_avatar',
-                            child: Avatar(
-                              width: 96,
-                              height: 96,
-                              navigateToDetail: false,
-                              account: _account,
+                            child: Hero(
+                              tag: 'user_avatar',
+                              child: Avatar(
+                                width: 96,
+                                height: 96,
+                                navigateToDetail: false,
+                                account: _account,
+                              ),
                             ),
                           ),
                         ),
-                      ),
+                        // Badge de câmera (editar foto), só no próprio perfil.
+                        if (mine.account != null &&
+                            mine.account.id == _account.id)
+                          Positioned(
+                            right: 0,
+                            bottom: 2,
+                            child: GestureDetector(
+                              onTap: () =>
+                                  AppNavigate.push(EditUserProfile(_account)),
+                              child: Container(
+                                width: 32,
+                                height: 32,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: FbColors.iconChipBackground,
+                                  border: Border.all(
+                                      width: 2, color: Colors.white),
+                                ),
+                                child: Icon(Icons.camera_alt,
+                                    size: 16, color: FbColors.textPrimary),
+                              ),
+                            ),
+                          ),
+                      ],
                     )),
               ]),
               //   more(context),
