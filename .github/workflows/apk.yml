@@ -1,29 +1,86 @@
-name: Build app
+name: Build Apk
+
 on:
-  push:
-    branches: [master]
   workflow_dispatch:
+  push:
+    branches: [ main, master ]
+
 jobs:
   Build-Apk:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
+
       - uses: actions/setup-java@v2
         with:
-          distribution: 'zulu'
-          java-version: '11'
+          distribution: zulu
+          java-version: 11
+
       - uses: subosito/flutter-action@v1.4.0
         with:
-          flutter-version: '1.22.6'
-          channel: 'stable'
+          flutter-version: 1.22.6
+          channel: stable
+
       - uses: nttld/setup-ndk@v1
         id: setup-ndk
         with:
           ndk-version: r20b
           add-to-path: false
           local-cache: true
+          link-to-sdk: false
+
       - name: Write local.properties
         run: echo "ndk.dir=${{ steps.setup-ndk.outputs.ndk-path }}" > android/local.properties
+
+      # --- NOVO: gera uma chave de assinatura própria, na hora, sem precisar
+      # de keystore do Google Play nem de segredos configurados antes. Uma
+      # chave é criada em disco (efêmera, só existe durante esse job) com o
+      # "keytool" que já vem junto do JDK (instalado no passo setup-java
+      # acima), e um key.properties é escrito apontando pra ela. O
+      # android/app/build.gradle já sabe usar esse key.properties quando ele
+      # existe (veja o arquivo build.gradle que te mandei).
+      #
+      # Atenção: como essa chave é gerada do zero a cada execução, cada APK
+      # fica assinado com uma chave DIFERENTE. Isso é ótimo pra só testar o
+      # build (funciona perfeitamente pra instalar do zero), mas impede
+      # "atualizar" um APK já instalado por cima do anterior (o Android exige
+      # a mesma assinatura). Se quiser poder atualizar o app entre builds,
+      # troque esse passo pelo modelo comentado mais abaixo, que usa uma
+      # chave fixa guardada em Secrets do repositório.
+      - name: Generate signing key (própria, sem Google)
+        run: |
+          keytool -genkeypair -v \
+            -keystore android/key.jks \
+            -keyalg RSA -keysize 2048 -validity 10000 \
+            -alias key \
+            -storepass dudubuild123 \
+            -keypass dudubuild123 \
+            -dname "CN=Dudu, OU=Dudu, O=Dudu, L=SP, S=SP, C=BR"
+          cat > android/key.properties <<EOF
+          storeFile=../key.jks
+          storePassword=dudubuild123
+          keyAlias=key
+          keyPassword=dudubuild123
+          EOF
+
+      # --- Alternativa recomendada pra poder atualizar o app entre builds:
+      # gere a chave UMA vez localmente (veja android/key.properties.example
+      # pro comando do keytool), converta pra base64
+      # (base64 -w0 android/key.jks) e salve o resultado num secret do
+      # repositório chamado ANDROID_KEYSTORE_BASE64, mais os secrets
+      # ANDROID_STORE_PASSWORD e ANDROID_KEY_PASSWORD. Depois troque o passo
+      # acima por este:
+      #
+      # - name: Restore signing key from secret
+      #   run: |
+      #     echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > android/key.jks
+      #     cat > android/key.properties <<EOF
+      #     storeFile=../key.jks
+      #     storePassword=${{ secrets.ANDROID_STORE_PASSWORD }}
+      #     keyAlias=key
+      #     keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }}
+      #     EOF
+
       - name: Build
         env:
           MASTODON_CLIENT_ID: ${{ secrets.MASTODON_CLIENT_ID }}
@@ -31,7 +88,6 @@ jobs:
           MASTODON_REDIRECT_URI: ${{ secrets.MASTODON_REDIRECT_URI }}
         run: |
           flutter pub get
-
           sed -i '/^cached_video_player=/d' .flutter-plugins || true
 
           REGISTRANT="android/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java"
@@ -64,11 +120,13 @@ jobs:
               print(".flutter-plugins-dependencies nao encontrado, seguindo")
           PYEOF
 
-          flutter build apk --debug --no-pub \
+          flutter build apk --release --no-pub \
             --dart-define=MASTODON_CLIENT_ID=$MASTODON_CLIENT_ID \
             --dart-define=MASTODON_CLIENT_SECRET=$MASTODON_CLIENT_SECRET \
             --dart-define=MASTODON_REDIRECT_URI=$MASTODON_REDIRECT_URI
-      - uses: actions/upload-artifact@v4
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
         with:
-          name: debug-apk
-          path: build/app/outputs/apk/debug/app-debug.apk
+          name: dudu-release-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
