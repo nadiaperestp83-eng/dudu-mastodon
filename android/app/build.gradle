@@ -1,0 +1,95 @@
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withReader('UTF-8') { reader ->
+        localProperties.load(reader)
+    }
+}
+
+def flutterRoot = localProperties.getProperty('flutter.sdk')
+if (flutterRoot == null) {
+    throw new GradleException("Flutter SDK not found. Define location with flutter.sdk in the local.properties file.")
+}
+
+def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
+if (flutterVersionCode == null) {
+    flutterVersionCode = '1'
+}
+
+def flutterVersionName = localProperties.getProperty('flutter.versionName')
+if (flutterVersionName == null) {
+    flutterVersionName = '1.0'
+}
+
+apply plugin: 'com.android.application'
+apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
+
+def keystoreProperties = new Properties()
+def keystorePropertiesFile = rootProject.file('key.properties')
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
+// Se existir uma chave própria (gerada com "keytool", sem depender do
+// Google Play), ela é usada. Caso contrário, cai automaticamente na
+// chave de debug do próprio Flutter/Android SDK (~/.android/debug.keystore,
+// gerada localmente na primeira vez que você builda o projeto), só para
+// não travar o build de release por falta de assinatura.
+def hasOwnKeystore = keystoreProperties['storeFile'] != null ||
+        (System.env.STORE_PASSWORD != null && System.env.KEY_PASSWORD != null)
+
+android {
+    compileSdkVersion 29
+
+    lintOptions {
+        disable 'InvalidPackage'
+    }
+
+    defaultConfig {
+        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
+        applicationId "fans.idudu.dudu"
+        minSdkVersion 16
+        targetSdkVersion 29
+        versionCode flutterVersionCode.toInteger()
+        versionName flutterVersionName
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    signingConfigs {
+        release {
+            if (hasOwnKeystore) {
+                keyAlias keystoreProperties['keyAlias'] ?: 'key'
+                keyPassword keystoreProperties['keyPassword'] ?: "$System.env.KEY_PASSWORD"
+                storeFile keystoreProperties['storeFile'] != null
+                        ? file(keystoreProperties['storeFile'])
+                        : file("../key.jks")
+                storePassword keystoreProperties['storePassword'] ?: "$System.env.STORE_PASSWORD"
+            }
+        }
+    }
+
+
+    buildTypes {
+        release {
+            // Usa a chave própria se existir; senão assina com a chave de
+            // debug (gerada localmente, sem custo e sem cadastro no
+            // Google Play) - assim "flutter build apk --release" sempre
+            // funciona, mesmo sem configurar nada antes.
+            signingConfig hasOwnKeystore ? signingConfigs.release : signingConfigs.debug
+        }
+
+        debug {
+            applicationIdSuffix ".debug"
+        }
+    }
+}
+
+flutter {
+    source '../..'
+}
+
+dependencies {
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0'
+}
