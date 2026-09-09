@@ -1,12 +1,14 @@
 import 'package:dudu/api/timeline_api.dart';
 import 'package:dudu/constant/fb_colors.dart';
 import 'package:dudu/l10n/l10n.dart';
+import 'package:dudu/models/logined_user.dart';
 import 'package:dudu/models/provider/settings_provider.dart';
 import 'package:dudu/pages/search/search_page_delegate.dart';
 import 'package:dudu/pages/status/new_status.dart';
 import 'package:dudu/utils/app_navigate.dart';
 import 'package:dudu/widget/common/app_bar_title.dart';
 import 'package:dudu/widget/common/custom_app_bar.dart';
+import 'package:dudu/widget/other/avatar.dart';
 import 'package:dudu/widget/setting/account_list_header.dart';
 import 'package:dudu/widget/timeline/timeline_content.dart';
 import 'package:flutter/material.dart';
@@ -89,9 +91,71 @@ class _HomeTimelineState extends State<HomeTimeline> {
           SizedBox(width: 8),
         ],
       ),
-      body: TimelineContent(
-        url: TimelineApi.home,
-        tag: 'home',
+      body: Column(
+        children: [
+          // Barra "No que você está pensando?" no topo do feed, estilo Facebook.
+          _ComposerBar(onTap: () {
+            AppNavigate.push(NewStatus(), routeType: RouterType.material);
+          }),
+          Container(color: FbColors.background, height: 8),
+          Expanded(
+            child: TimelineContent(
+              url: TimelineApi.home,
+              tag: 'home',
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Barra de composição no topo do feed ("No que você está pensando?"),
+/// com o avatar do usuário logado - estilo Facebook. Ao tocar, abre a
+/// tela de nova publicação (New Status) do Mastodon.
+class _ComposerBar extends StatelessWidget {
+  final VoidCallback onTap;
+
+  const _ComposerBar({Key key, this.onTap}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: FbColors.cardBackground,
+      padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+      child: Row(
+        children: [
+          Avatar(
+            width: 40,
+            height: 40,
+            navigateToDetail: false,
+            account: LoginedUser().account,
+          ),
+          SizedBox(width: 10),
+          Expanded(
+            child: InkWell(
+              onTap: onTap,
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                decoration: BoxDecoration(
+                  color: FbColors.background,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  S.of(context).beep,
+                  style: TextStyle(
+                      color: FbColors.textSecondary, fontSize: 15),
+                ),
+              ),
+            ),
+          ),
+          SizedBox(width: 8),
+          InkWell(
+            onTap: onTap,
+            child: Icon(Icons.photo_library, color: Colors.green[700], size: 24),
+          ),
+        ],
       ),
     );
   }
