@@ -66,7 +66,8 @@ class StatusItemActionW extends StatelessWidget {
               ),
               Spacer()
             ],
-            InkWell(
+            Expanded(
+              child: InkWell(
               onTap: () async {
                 var realStatus =
                     await StatusActionUtil.getStatusInLocal(context, status);
@@ -76,44 +77,57 @@ class StatusItemActionW extends StatelessWidget {
               child: Padding(
                 padding: EdgeInsets.all(subStatus ? 4.0 : 8.0),
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
                     Icon(IconFont.forward, size: iconSize, color: color),
                     SizedBox(
                       width: 3,
                     ),
-                    Text(
-                      subStatus ? '' : S.of(context).review,
-                      style: TextStyle(fontSize: fontSize, color: color),
+                    Flexible(
+                      child: Text(
+                        subStatus ? '' : S.of(context).review,
+                        style: TextStyle(fontSize: fontSize, color: color),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
                     ),
                     Text(
                       (status.repliesCount <= 0 || !showNum)
                           ? ''
-                          : status.repliesCount.toString(),
+                          : ' ${status.repliesCount}',
                       style: TextStyle(fontSize: fontSize - 1, color: color),
                       textAlign: TextAlign.center,
                     )
                   ],
                 ),
               ),
-            ),
-            SizedBox(
-              width: 10,
+              ),
             ),
             if (status.visibility == 'private')
-              Icon(
-                IconFont.lock,
-                color: Theme.of(context).accentColor,
-                size: 20,
+              Expanded(
+                child: Center(
+                  child: Icon(
+                    IconFont.lock,
+                    color: Theme.of(context).accentColor,
+                    size: 20,
+                  ),
+                ),
               ),
             if (status.visibility == 'direct')
-              Icon(
-                IconFont.message,
-                color: Theme.of(context).accentColor,
-                size: 20,
+              Expanded(
+                child: Center(
+                  child: Icon(
+                    IconFont.message,
+                    color: Theme.of(context).accentColor,
+                    size: 20,
+                  ),
+                ),
               ),
             if (status.visibility != 'private' && status.visibility != 'direct')
-              LikeButton(
+              Expanded(
+                child: Center(
+                child: LikeButton(
                 padding: EdgeInsets.all(subStatus ? 4.0 : 8.0),
                 size: 20 * ScreenUtil.scaleFromSetting(textScale),
                 likeCountPadding: EdgeInsets.zero,
@@ -130,17 +144,23 @@ class StatusItemActionW extends StatelessWidget {
                 },
                 countDecoration: (Widget count, int likeCount) {
                   return Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
                       SizedBox(
                         width: 3,
                       ),
-                      Text(
-                        subStatus ? '' : S.of(context).turn_to,
-                        style: TextStyle(
-                            fontSize: fontSize,
-                            color: status.reblogged != null && status.reblogged
-                                ? FbColors.primaryBlue
-                                : Theme.of(context).accentColor),
+                      Flexible(
+                        child: Text(
+                          subStatus ? '' : S.of(context).turn_to,
+                          style: TextStyle(
+                              fontSize: fontSize,
+                              color: status.reblogged != null &&
+                                      status.reblogged
+                                  ? FbColors.primaryBlue
+                                  : Theme.of(context).accentColor),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ),
                       ),
                       SizedBox(
                         width: 2,
@@ -170,11 +190,12 @@ class StatusItemActionW extends StatelessWidget {
                     CircleColor(start: Colors.blue[300], end: Colors.blue[700]),
                 onTap: (isLiked) =>
                     StatusActionUtil.reblog(isLiked, status, context),
+                ),
+                ),
               ),
-            SizedBox(
-              width: 10,
-            ),
-            LikeButton(
+            Expanded(
+              child: Center(
+              child: LikeButton(
               padding: EdgeInsets.all(subStatus ? 4.0 : 8.0),
               size: 20 * ScreenUtil.scaleFromSetting(textScale),
               likeCountPadding: EdgeInsets.zero,
@@ -191,17 +212,22 @@ class StatusItemActionW extends StatelessWidget {
               },
               countDecoration: (Widget count, int likeCount) {
                 return Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
                     SizedBox(
                       width: 3,
                     ),
-                    Text(
-                      subStatus ? '' : zan_text,
-                      style: TextStyle(
-                          fontSize: fontSize,
-                          color: status.favourited != null && status.favourited
-                              ? FbColors.primaryBlue
-                              : Theme.of(context).accentColor),
+                    Flexible(
+                      child: Text(
+                        subStatus ? '' : zan_text,
+                        style: TextStyle(
+                            fontSize: fontSize,
+                            color: status.favourited != null && status.favourited
+                                ? FbColors.primaryBlue
+                                : Theme.of(context).accentColor),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
                     ),
                     SizedBox(
                       width: 2,
@@ -226,6 +252,8 @@ class StatusItemActionW extends StatelessWidget {
               isLiked: status.favourited ?? false,
               onTap: (isLiked) =>
                   StatusActionUtil.favourite(isLiked, status, context),
+              ),
+              ),
             ),
           ],
         ),
