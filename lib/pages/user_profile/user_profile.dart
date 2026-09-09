@@ -1,4 +1,4 @@
-import 'package:cached_network_image/cached_network_image.dart';
+  import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:dudu/api/accounts_api.dart';
 import 'package:dudu/constant/icon_font.dart';
@@ -540,6 +540,440 @@ class _UserProfileState extends State<UserProfile>
                                                   BorderRadius.circular(8)),
                                           textColor: Colors.white,
                                           child: Text(
+                                            relationShip == null
+                                                ? 'whatever'
+                                                : mine.account.id ==
+                                                        _account.id
+                                                    ? S
+                                                        .of(context)
+                                                        .edit_information
+                                                    : relationShip.blocking
+                                                        ? S.of(context).unblock
+                                                        : relationShip
+                                                                .requested
+                                                            ? S
+                                                                .of(context)
+                                                                .follow_request_sent
+                                                            : relationShip
+                                                                    .following
+                                                                ? S
+                                                                    .of(context)
+                                                                    .unsubscribe
+                                                                : S
+                                                                    .of(context)
+                                                                    .attention,
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.w700),
+                                          ),
+                                          onPressed: _onPressButton,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            headerFollowsAndFollowers()
+                          ],
+                          SizedBox(
+                            height: 10,
+                          )
+                        ],
+                      ),
+                    )
+                  ],
+                ),
+                // Foto de perfil circular sobreposta na borda inferior da
+                // capa (metade na capa, metade no fundo branco), alinhada
+                // à esquerda, com borda branca grossa - estilo Facebook.
+                Positioned(
+                    top: 140,
+                    left: 16,
+                    child: Stack(
+                      overflow: Overflow.visible,
+                      children: [
+                        GestureDetector(
+                          behavior: HitTestBehavior.translucent,
+                          onTap: () => AppNavigate.push(
+                              PhotoGallery(
+                                galleryItems: [
+                                  MediaAttachment.fromJson({
+                                    'url': _account.avatar,
+                                    'preview_url': _account.avatar,
+                                    'id': 'user_avatar'
+                                  })
+                                ],
+                                initialIndex: 0,
+                              ),
+                              routeType: RouterType.fade),
+                          child: Container(
+                            width: 104,
+                            height: 104,
+                            decoration: BoxDecoration(
+                              border:
+                                  Border.all(width: 4, color: Colors.white),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Hero(
+                              tag: 'user_avatar',
+                              child: Avatar(
+                                width: 96,
+                                height: 96,
+                                navigateToDetail: false,
+                                account: _account,
+                              ),
+                            ),
+                          ),
+                        ),
+                        // Badge de câmera (editar foto), só no próprio perfil.
+                        if (mine.account != null &&
+                            mine.account.id == _account.id)
+                          Positioned(
+                            right: 0,
+                            bottom: 2,
+                            child: GestureDetector(
+                              onTap: () =>
+                                  AppNavigate.push(EditUserProfile(_account)),
+                              child: Container(
+                                width: 32,
+                                height: 32,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: FbColors.iconChipBackground,
+                                  border: Border.all(
+                                      width: 2, color: Colors.white),
+                                ),
+                                child: Icon(Icons.camera_alt,
+                                    size: 16, color: FbColors.textPrimary),
+                              ),
+                            ),
+                          ),
+                      ],
+                    )),
+              ]),
+              //   more(context),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget headerFields() {
+    List<Widget> rows = [];
+    for (var filed in _account.fields) {
+      rows.add(Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Expanded(
+              flex: 3,
+              child: HtmlContent(
+                filed['name'],
+                emojis: _account.emojis,
+                //      shrinkToFit: true,
+              )),
+          Expanded(
+            flex: 7,
+            child: DefaultTextStyle.merge(
+              style: TextStyle(color: Theme.of(context).accentColor),
+              child: HtmlContent(
+                filed['value'],
+                emojis: _account.emojis,
+                //      shrinkToFit: true,
+              ),
+            ),
+          )
+        ],
+      ));
+    }
+    return Column(
+      children: rows,
+    );
+  }
+
+  _isRemoteCachedAccount() {
+    if (!widget.account.url.startsWith(LoginedUser().host) &&
+        widget.account.avatar.startsWith(LoginedUser().host)) {
+      return true;
+    }
+    return false;
+  }
+
+  // Barra limpa e centralizada com os contadores de publicações,
+  // seguindo e seguidores - estilo Facebook.
+  Widget _statCounter(String count, String label, VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+        child: Column(
+          children: [
+            Text(count,
+                style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 16,
+                    color: FbColors.textPrimary)),
+            Text(label,
+                style: TextStyle(
+                    fontSize: 13, color: FbColors.textSecondary)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget headerFollowsAndFollowers() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        _statCounter(_account.statusesCount.toString(), S.of(context).toot,
+            () => _tabController.animateTo(0)),
+        _statCounter(_account.followingCount.toString(),
+            S.of(context).attention, () async {
+          if (widget.hostUrl != null) return null;
+          AppNavigate.push(UserFollowing(_account.id));
+        }),
+        _statCounter(_account.followersCount.toString(), S.of(context).fans,
+            () async {
+          if (widget.hostUrl != null) return;
+          AppNavigate.push(UserFollowers(_account.id));
+        }),
+      ],
+    );
+  }
+
+  Widget tabText(String text) {
+//    return Container(
+//      padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
+//      child: Text(
+//        text,
+//        style: TextStyle(
+//            fontSize: 18,
+//            color: Theme.of(context).accentColor,
+//            fontWeight: FontWeight.normal),
+//      ),
+//    );
+    return Tab(
+      text: text,
+    );
+  }
+
+  Widget contentView() {
+    return TabBarView(
+      controller: _tabController,
+      //    index: _tabIndex,
+      children: <Widget>[
+        extend.NestedScrollViewInnerScrollPositionKeyWidget(
+            Key('tab0'),
+            ChangeNotifierProvider<ResultListProvider>.value(
+              value: providers[0],
+              child: ProviderEasyRefreshListView(),
+            )),
+        extend.NestedScrollViewInnerScrollPositionKeyWidget(
+            Key('tab1'),
+            ChangeNotifierProvider<ResultListProvider>.value(
+              value: providers[1],
+              child: ProviderEasyRefreshListView(
+                firstRefresh: true,
+              ),
+            )),
+        extend.NestedScrollViewInnerScrollPositionKeyWidget(
+            Key('tab2'),
+            ChangeNotifierProvider<ResultListProvider>.value(
+              value: providers[2],
+              child: ProviderEasyRefreshListView(
+                firstRefresh: true,
+              ),
+            )),
+        extend.NestedScrollViewInnerScrollPositionKeyWidget(
+            Key('tab3'),
+            ChangeNotifierProvider<ResultListProvider>.value(
+              value: providers[3],
+              child: Container(
+                key: PageStorageKey('tab3'),
+                child: ProviderEasyRefreshListView(
+                  usingGrid: true,
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3),
+                  firstRefresh: true,
+                ),
+              ),
+            )),
+      ],
+    );
+  }
+
+  _buildGridItem(int idx, List data, ResultListProvider provider) {
+    MediaAttachment media = MediaAttachment.fromJson(data[idx]);
+    return InkWell(
+      onTap: () => AppNavigate.push(
+          PhotoGallery(
+            initialIndex: idx,
+            galleryItems:
+                provider.list.map((e) => MediaAttachment.fromJson(e)).toList(),
+          ),
+          routeType: RouterType.fade),
+      child: Hero(
+        tag: media.id,
+        flightShuttleBuilder: (
+          BuildContext flightContext,
+          Animation<double> animation,
+          HeroFlightDirection flightDirection,
+          BuildContext fromHeroContext,
+          BuildContext toHeroContext,
+        ) {
+          final Hero hero = flightDirection == HeroFlightDirection.push
+              ? fromHeroContext.widget
+              : toHeroContext.widget;
+          return hero.child;
+        },
+        child: CachedNetworkImage(
+            progressIndicatorBuilder: (context, widget, chunk) {
+              return Container(
+                color: Theme.of(context).accentColor,
+              );
+            },
+            fit: BoxFit.cover,
+            imageUrl: media.previewUrl,
+            cacheManager: CustomCacheManager()),
+      ),
+    );
+  }
+
+  _setShowAccountInfo(bool value) {
+    if (value != _showAccountInfoInAppBar) {
+      setState(() {
+        _showAccountInfoInAppBar = value;
+      });
+    }
+  }
+
+  Future<void> _onRefreshPage({bool firstRefresh = false}) async {
+    if (!firstRefresh) providers[_tabController.index]?.refresh();
+    var newAccount = await AccountsApi.getAccount(widget.account,
+        hostUrl: widget.hostUrl, cancelToken: cancelToken);
+    if (newAccount != null &&
+        newAccount.id == LoginedUser().account.id &&
+        widget.hostUrl == null) {
+      AccountUtil.updateAccount(newAccount);
+    }
+    var newRelationShip = await AccountsApi.getRelationShip(widget.account,
+        hostUrl: widget.hostUrl, cancelToken: cancelToken);
+    if (newAccount != null &&
+        newRelationShip != null &&
+        mounted) if (newAccount.acct == mine.account.acct) {
+      mine.account = newAccount;
+      LocalStorageAccount.addOwnerAccount(newAccount);
+    }
+    if (newAccount == null) {
+      DialogUtils.showInfoDialog(
+          context, S.of(context).failed_to_obtain_user_information);
+    }
+    setState(() {
+      _account = newAccount ?? _account;
+      relationShip = newRelationShip ?? relationShip;
+
+      _resetExpandHeight();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: extend.NestedScrollViewRefreshIndicator(
+        onRefresh: _onRefreshPage,
+        child: extend.NestedScrollView(
+          innerScrollPositionKeyBuilder: () {
+            return Key('tab${_tabController.index}');
+          },
+          controller: _scrollController,
+          headerSliverBuilder: (context, boxIsScrolled) {
+            return [
+              SliverAppBar(
+                titleSpacing: 0,
+                leading: InkWell(
+                  onTap: () => AppNavigate.pop(),
+                  child: Icon(IconFont.back),
+                ),
+                title: _showAccountInfoInAppBar
+                    ? _account == null
+                        ? Container()
+                        : Container(
+                            width: double.infinity,
+                            color: Theme.of(context).appBarTheme.color,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Text(
+                                  _account != null
+                                      ? StringUtil.displayName(_account)
+                                      : '',
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                Text(
+                                  '@' + _account.acct,
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.normal),
+                                )
+                              ],
+                            ),
+                          )
+                    : Container(),
+                centerTitle: false,
+                pinned: true,
+                floating: false,
+                snap: false,
+                //backgroundColor: Colors.transparent,
+                actions: <Widget>[
+                  IconButton(
+                    icon: Icon(IconFont.moreHoriz),
+                    onPressed: _showMore,
+                  )
+                ],
+                flexibleSpace: !_getSliverExpandHeight
+                    ? userHeader(context)
+                    : FlexibleSpaceBar(
+                        collapseMode: CollapseMode.pin,
+                        background: userHeader(context),
+                      ),
+                expandedHeight: _sliverExpandHeight,
+                bottom: ColoredTabBar(
+                  color: Theme.of(context).appBarTheme.color,
+                  tabBar: Align(
+                    alignment: Alignment.centerLeft,
+                    child: TabBar(
+                      labelColor: Theme.of(context).buttonColor,
+                      unselectedLabelColor: Theme.of(context).accentColor,
+                      labelStyle: TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.normal),
+                      isScrollable: true,
+                      indicatorColor: Theme.of(context).buttonColor,
+                      tabs: [
+                        tabText(S.of(context).toot),
+                        tabText(S.of(context).toot_and_reply),
+                        tabText(S.of(context).pinned),
+                        tabText(S.of(context).media),
+                      ],
+                      onTap: (index) {
+                        setState(() {});
+                      },
+                      controller: _tabController,
+                    ),
+                  ),
+                ),
+              )
+            ];
+          },
+          body: contentView(),
+        ),
+      ),
+    );
+  }
+}                                        child: Text(
                                             relationShip == null
                                                 ? 'whatever'
                                                 : mine.account.id ==
