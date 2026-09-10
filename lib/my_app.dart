@@ -56,16 +56,8 @@ class App extends StatelessWidget {
       locale:
           Locale(Provider.of<SettingsProvider>(context).settings['language']),
       supportedLocales: [
-        const Locale('en', ''),
-        const Locale('zh', ''),
-        const Locale('fr', ''),
-        const Locale('ru', ''),
-        const Locale('ar', ''),
-        const Locale('es', ''),
-        const Locale('ja', ''),
-        const Locale('de', ''),
         const Locale('pt', ''),
-        // ... other locales the app supports
+        const Locale('en', ''),
       ],
       theme: ThemeUtil.themes[chooseTheme],
       onGenerateTitle: (context) => S.of(context).app_name,
