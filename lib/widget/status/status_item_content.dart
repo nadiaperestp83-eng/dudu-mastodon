@@ -19,7 +19,9 @@ class StatusItemContent extends StatelessWidget {
       StatusItemMedia(data,subStatus: subStatus),
       if (data.poll != null)
       StatusItemPoll(data),
-      if (primary)
+      // Card de pré-visualização de link: antes só aparecia na tela de
+      // detalhe do post (primary). Agora aparece sempre que o toot tiver
+      // um link com imagem, também no feed - como Facebook/Twitter fazem.
       StatusItemCard(data),
     ],);
   }
