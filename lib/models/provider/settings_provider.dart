@@ -84,10 +84,10 @@ class SettingsProvider extends ChangeNotifier {
         'mention',
         'poll'
       ],
-      'language': ['zh', 'en', 'fr', 'ru', 'ar', 'es', 'ja', 'de', 'pt']
-              .contains(langCode)
-          ? langCode
-          : 'en',
+      // App é PT-BR por padrão; só cai pro inglês se o aparelho estiver
+      // configurado em inglês. Qualquer outro idioma do sistema também
+      // cai em português (fallback), já que só essas 2 opções existem.
+      'language': langCode == 'en' ? 'en' : 'pt',
       'translate_engine': Platform.localeName.startsWith('zh') ? '1' : '0',
       'red_dot_notfication': true
     };
