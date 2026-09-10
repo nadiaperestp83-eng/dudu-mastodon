@@ -1,5 +1,6 @@
 import 'package:dudu/l10n/l10n.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:dudu/constant/fb_colors.dart';
 import 'package:dudu/models/json_serializable/owner_account.dart';
 import 'package:dudu/models/provider/settings_provider.dart';
 import 'package:dudu/pages/setting/edit_user_profile.dart';
@@ -22,7 +23,7 @@ class SettingHead extends StatelessWidget {
       return Container();
     }
     return Ink(
-      color: Theme.of(context).primaryColor,
+      color: FbColors.cardBackground,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -50,8 +51,12 @@ class SettingHead extends StatelessWidget {
       child: Column(
         children: <Widget>[
           Text('$number',
-              style: TextStyle(fontSize: 15)),
-          Text(title, style: TextStyle(fontSize: 13,color: Theme.of(navGK.currentContext).accentColor))
+              style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: FbColors.textPrimary)),
+          Text(title,
+              style: TextStyle(fontSize: 13, color: FbColors.textSecondary))
         ],
       ),
     );
@@ -61,44 +66,73 @@ class SettingHead extends StatelessWidget {
   Widget build(BuildContext context) {
     OwnerAccount account = Provider.of<SettingsProvider>(context)?.currentUser?.account;
 
-    return account == null? Container(height: 180,):Column(
+    if (account == null) return Container(height: 220);
+
+    return Column(
       children: [
-        Container(
-          height: 180,
-          width: ScreenUtil.width(context),
-          decoration: BoxDecoration(
-              image: DecorationImage(
-                  fit: BoxFit.cover,
-                  colorFilter: new ColorFilter.mode(
-                      Colors.black.withOpacity(0.5), BlendMode.dstATop),
-                  image: CachedNetworkImageProvider(
-                    account.header,
-                    cacheManager: CustomCacheManager()
-                  ))),
-          child: Column(
-            children: [
-              SizedBox(height: 90,),
-              ListTile(
-                leading: NoSplashInkWell(
+        // Capa + avatar circular centralizado sobreposto, estilo Facebook
+        // (mesmo tratamento visual do perfil público).
+        Stack(
+          overflow: Overflow.visible,
+          children: [
+            Container(
+              height: 150,
+              width: ScreenUtil.width(context),
+              color: FbColors.divider,
+              child: account.header != null
+                  ? CachedNetworkImage(
+                      fit: BoxFit.cover,
+                      imageUrl: account.header,
+                      cacheManager: CustomCacheManager(),
+                      width: double.infinity,
+                      height: 150,
+                    )
+                  : null,
+            ),
+            Positioned(
+              top: 110,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: NoSplashInkWell(
                   onTap: () => AppNavigate.push(EditUserProfile(account)),
-                  child: Avatar(
-                    account: account,
-                    width: 60,
-                    height: 60,
-                    navigateToDetail: false,
+                  child: Container(
+                    width: 88,
+                    height: 88,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(width: 4, color: Colors.white),
+                    ),
+                    child: Avatar(
+                      account: account,
+                      width: 80,
+                      height: 80,
+                      navigateToDetail: false,
+                    ),
                   ),
                 ),
-                title: Text(
-                  StringUtil.displayName(account),
-                  style: TextStyle(fontSize: 18),
-                ),
-                subtitle: Text(StringUtil.accountFullAddress(account),
-                    style: TextStyle(fontSize: 15)),
-              )
-            ],
-          ),
+              ),
+            ),
+          ],
         ),
-        userStatistics(context,account)
+        SizedBox(height: 46),
+        Text(
+          StringUtil.displayName(account),
+          textAlign: TextAlign.center,
+          style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
+              color: FbColors.textPrimary),
+        ),
+        SizedBox(height: 2),
+        Text(
+          StringUtil.accountFullAddress(account),
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 14, color: FbColors.textSecondary),
+        ),
+        SizedBox(height: 8),
+        userStatistics(context,account),
+        Container(height: 8, color: FbColors.background),
       ],
     );
   }
