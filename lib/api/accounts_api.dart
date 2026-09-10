@@ -22,6 +22,33 @@ class AccountsApi {
     return OwnerAccount.fromJson(data);
   }
 
+  // Sugestões de contas pra seguir (perfis/páginas/fóruns), usadas no
+  // carrossel "Sugestões para você" no topo do feed - equivalente ao
+  // endpoint v2 do Mastodon, com fallback pro v1 em instâncias mais antigas.
+  static Future<List<OwnerAccount>> getSuggestions({int limit = 10}) async {
+    var res = await Request.get(
+        url: '/api/v2/suggestions', params: {'limit': limit});
+    if (res == null) {
+      // Fallback: instâncias antigas só têm o endpoint v1, que já
+      // retorna a lista de contas diretamente (sem o campo "account").
+      var resV1 = await Request.get(
+          url: '/api/v1/suggestions', params: {'limit': limit});
+      if (resV1 is List) {
+        return resV1
+            .map<OwnerAccount>((item) => OwnerAccount.fromJson(item))
+            .toList();
+      }
+      return [];
+    }
+    if (res is List) {
+      return res
+          .where((item) => item['account'] != null)
+          .map<OwnerAccount>((item) => OwnerAccount.fromJson(item['account']))
+          .toList();
+    }
+    return [];
+  }
+
   static Future<OwnerAccount> getAccount(OwnerAccount account,{String hostUrl,CancelToken cancelToken}) async {
 
 
