@@ -81,8 +81,11 @@ class TextWithEmoji extends StatelessWidget {
         textScaleFactor: ScreenUtil.scaleFromSetting(textScale),
         maxLines: maxLines,
         overflow: overflow,
-        text:
-            TextSpan(children: getTextSpans(text:text, emojis:emojis),style: style ?? DefaultTextStyle.of(context).style),
+        text: TextSpan(
+            children: getTextSpans(text: text, emojis: emojis),
+            // Garante que a fonte do tema (Inter) seja herdada mesmo quando
+            // um "style" customizado é passado sem fontFamily definido.
+            style: DefaultTextStyle.of(context).style.merge(style)),
       );
     }
   }
