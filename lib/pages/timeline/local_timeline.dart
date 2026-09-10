@@ -10,6 +10,7 @@ import 'package:dudu/widget/common/app_bar_title.dart';
 import 'package:dudu/widget/common/custom_app_bar.dart';
 import 'package:dudu/widget/other/avatar.dart';
 import 'package:dudu/widget/setting/account_list_header.dart';
+import 'package:dudu/widget/timeline/suggestions_carousel.dart';
 import 'package:dudu/widget/timeline/timeline_content.dart';
 import 'package:flutter/material.dart';
 import 'package:mk_drop_down_menu/mk_drop_down_menu.dart';
@@ -97,6 +98,10 @@ class _HomeTimelineState extends State<HomeTimeline> {
           _ComposerBar(onTap: () {
             AppNavigate.push(NewStatus(), routeType: RouterType.material);
           }),
+          Container(color: FbColors.background, height: 8),
+          // Carrossel "Sugestões para você" (contas/páginas/fóruns pra
+          // seguir), puxado da API do Mastodon.
+          SuggestionsCarousel(),
           Container(color: FbColors.background, height: 8),
           Expanded(
             child: TimelineContent(
