@@ -53,7 +53,9 @@ class StatusItemAccountW extends StatelessWidget {
                 children: <Widget>[
                   SizedBox(height: 5,),
                   RichText(
-                    text: TextSpan(children: [
+                    text: TextSpan(
+                      style: DefaultTextStyle.of(context).style,
+                      children: [
                       ...TextWithEmoji.getTextSpans(
                           text: StringUtil.displayName(status.account),
                           emojis: status.account.emojis,
@@ -77,7 +79,9 @@ class StatusItemAccountW extends StatelessWidget {
                   ),
                   Spacer(),
                   RichText(
-                    text: TextSpan(children: [
+                    text: TextSpan(
+                      style: DefaultTextStyle.of(context).style,
+                      children: [
                       if (primary) ...[
                       WidgetSpan(
                         child: Icon(AppConfig.visibilityIcons[status.visibility],size: 14,)
@@ -165,7 +169,9 @@ class SubStatusAccountW extends StatelessWidget {
       alignment: Alignment.centerLeft,
       padding: EdgeInsets.only(bottom: 0),
       child: RichText(
-        text: TextSpan(children: [
+        text: TextSpan(
+          style: DefaultTextStyle.of(context).style,
+          children: [
           ...TextWithEmoji.getTextSpans(
               text: StringUtil.displayName(status.account),
               emojis: status.account.emojis,
