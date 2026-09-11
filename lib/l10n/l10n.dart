@@ -1,3 +1,8 @@
-arb-dir: lib/l10n
-template-arb-file: app_en.arb
-output-localization-file: app_localizations.dart
+import 'package:flutter/cupertino.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
+class S {
+  static AppLocalizations of(BuildContext context) {
+    return AppLocalizations.of(context);
+  }
+}
