@@ -11,13 +11,18 @@ class TimelineContent extends StatefulWidget {
   final RowBuilder rowBuilder;
   final bool prefixId; // solve hero problem
   final ResultListProvider provider;
+  // Quantidade de itens extras (header) que o rowBuilder desenha antes dos
+  // itens vindos da API, para permitir que widgets como a barra de post e o
+  // carrossel de sugestões rolem junto com o feed (item 0..N do rowBuilder).
+  final int addToSliverCount;
 
   TimelineContent(
       {this.url,
       this.tag,
       this.rowBuilder,
       this.prefixId = true,
-      this.provider});
+      this.provider,
+      this.addToSliverCount = 0});
   @override
   _TimelineContentState createState() => _TimelineContentState();
 }
@@ -85,6 +90,7 @@ class _TimelineContentState extends State<TimelineContent> {
             builder: (context, snap) {
               return ProviderEasyRefreshListView(
                 scrollController: _scrollController,
+                addToSliverCount: widget.addToSliverCount,
               );
             });
   }
