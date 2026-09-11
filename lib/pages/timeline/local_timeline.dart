@@ -1,15 +1,16 @@
 import 'package:dudu/api/timeline_api.dart';
 import 'package:dudu/constant/fb_colors.dart';
 import 'package:dudu/l10n/l10n.dart';
+import 'package:dudu/models/json_serializable/article_item.dart';
 import 'package:dudu/models/logined_user.dart';
+import 'package:dudu/models/provider/result_list_provider.dart';
 import 'package:dudu/models/provider/settings_provider.dart';
 import 'package:dudu/pages/search/search_page_delegate.dart';
 import 'package:dudu/pages/status/new_status.dart';
 import 'package:dudu/utils/app_navigate.dart';
-import 'package:dudu/widget/common/app_bar_title.dart';
-import 'package:dudu/widget/common/custom_app_bar.dart';
 import 'package:dudu/widget/other/avatar.dart';
 import 'package:dudu/widget/setting/account_list_header.dart';
+import 'package:dudu/widget/status/status_item.dart';
 import 'package:dudu/widget/timeline/suggestions_carousel.dart';
 import 'package:dudu/widget/timeline/timeline_content.dart';
 import 'package:flutter/material.dart';
@@ -18,10 +19,20 @@ import 'package:nav_router/nav_router.dart';
 
 import '../../widget/other/search.dart' as customSearch;
 
+/// Feed principal (aba Home), no padrão de rolagem única do Facebook:
+/// UM único cabeçalho compacto no topo (logo + busca/notificações/postar) e
+/// TUDO o resto -- barra de "No que você está pensando?", carrossel de
+/// sugestões e os posts -- dentro da MESMA lista rolável. Nada fica fixo
+/// além do cabeçalho: ao rolar para cima, a barra de post e as sugestões
+/// somem junto com o resto, liberando a tela inteira para a timeline.
 class HomeTimeline extends StatefulWidget {
   @override
   _HomeTimelineState createState() => _HomeTimelineState();
 }
+
+// Quantidade de "itens de cabeçalho" injetados no topo da lista antes dos
+// posts reais: 0 = barra de post, 1 = carrossel de sugestões.
+const int _kHeaderItemCount = 2;
 
 class _HomeTimelineState extends State<HomeTimeline> {
   GlobalKey _headerKey;
@@ -39,32 +50,36 @@ class _HomeTimelineState extends State<HomeTimeline> {
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: CustomAppBar(
-        centerTitle: false,
-        automaticallyImplyLeading: false,
-        key: _headerKey,
-        // Logo do app em azul e negrito à esquerda, estilo Facebook.
-        title: MKDropDownMenu(
-          controller: _downMenuController,
-          headerBuilder: (menuShowing) {
-            return DropDownTitle(
-              title: S.of(context).home,
-              expand: menuShowing,
-              showIcon: true,
-              fontColor: FbColors.primaryBlue,
-              fontWeight: FontWeight.w800,
-              fontSize: 22,
-            );
-          },
-          headerKey: _headerKey,
-          menuBuilder: () {
-            return AccountListHeader(_downMenuController);
-          },
-        ),
-        actions: [
+  // Linha do cabeçalho: logo/seletor de conta à esquerda, ações à direita,
+  // tudo em uma única linha compacta (SEM Scaffold/AppBar aninhado -- é
+  // isso que causava o cabeçalho duplo e o padding extra de SafeArea).
+  Widget _buildHeader() {
+    return Container(
+      key: _headerKey,
+      height: 48,
+      color: FbColors.cardBackground,
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      child: Row(
+        children: [
+          Expanded(
+            child: MKDropDownMenu(
+              controller: _downMenuController,
+              headerBuilder: (menuShowing) {
+                return DropDownTitle(
+                  title: S.of(context).home,
+                  expand: menuShowing,
+                  showIcon: true,
+                  fontColor: FbColors.primaryBlue,
+                  fontWeight: FontWeight.w800,
+                  fontSize: 21,
+                );
+              },
+              headerKey: _headerKey,
+              menuBuilder: () {
+                return AccountListHeader(_downMenuController);
+              },
+            ),
+          ),
           _FbIconChip(
             icon: Icons.search,
             onTap: () {
@@ -89,35 +104,50 @@ class _HomeTimelineState extends State<HomeTimeline> {
               AppNavigate.push(NewStatus(), routeType: RouterType.material);
             },
           ),
-          SizedBox(width: 8),
         ],
       ),
-      body: Column(
-        children: [
-          // Barra "No que você está pensando?" no topo do feed, estilo Facebook.
-          _ComposerBar(onTap: () {
-            AppNavigate.push(NewStatus(), routeType: RouterType.material);
-          }),
-          Container(color: FbColors.background, height: 8),
-          // Carrossel "Sugestões para você" (contas/páginas/fóruns pra
-          // seguir), puxado da API do Mastodon.
-          SuggestionsCarousel(),
-          Container(color: FbColors.background, height: 8),
-          Expanded(
-            child: TimelineContent(
-              url: TimelineApi.home,
-              tag: 'home',
-            ),
+    );
+  }
+
+  // Desenha os itens da lista única: 2 primeiros = post box + carrossel,
+  // resto = posts normais do timeline (mesmo builder de sempre).
+  Widget _rowBuilder(int index, List data, ResultListProvider provider) {
+    if (index == 0) {
+      return _ComposerBar(onTap: () {
+        AppNavigate.push(NewStatus(), routeType: RouterType.material);
+      });
+    }
+    if (index == 1) {
+      return SuggestionsCarousel();
+    }
+    final realIndex = index - _kHeaderItemCount;
+    StatusItemData lineItem = StatusItemData.fromJson(data[realIndex]);
+    return StatusItem(item: lineItem);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        _buildHeader(),
+        Container(color: FbColors.background, height: 1),
+        Expanded(
+          child: TimelineContent(
+            url: TimelineApi.home,
+            tag: 'home',
+            rowBuilder: _rowBuilder,
+            addToSliverCount: _kHeaderItemCount,
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
 
 /// Barra de composição no topo do feed ("No que você está pensando?"),
 /// com o avatar do usuário logado - estilo Facebook. Ao tocar, abre a
-/// tela de nova publicação (New Status) do Mastodon.
+/// tela de nova publicação (New Status) do Mastodon. Agora é só mais um
+/// item da lista do feed, então rola junto com os posts.
 class _ComposerBar extends StatelessWidget {
   final VoidCallback onTap;
 
