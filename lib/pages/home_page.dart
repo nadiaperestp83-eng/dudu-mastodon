@@ -294,7 +294,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     return InkWell(
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -315,9 +315,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                   )
               ],
             ),
-            SizedBox(height: 8),
+            SizedBox(height: 4),
             Container(
-              height: 3,
+              height: 2,
               width: 26,
               decoration: BoxDecoration(
                   color: active ? activeColor : Colors.transparent,
