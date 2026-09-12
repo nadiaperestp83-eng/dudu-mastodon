@@ -8,6 +8,7 @@ import 'package:dudu/models/provider/settings_provider.dart';
 import 'package:dudu/pages/search/search_page_delegate.dart';
 import 'package:dudu/pages/status/new_status.dart';
 import 'package:dudu/utils/app_navigate.dart';
+import 'package:dudu/widget/common/app_bar_title.dart';
 import 'package:dudu/widget/other/avatar.dart';
 import 'package:dudu/widget/setting/account_list_header.dart';
 import 'package:dudu/widget/status/status_item.dart';
