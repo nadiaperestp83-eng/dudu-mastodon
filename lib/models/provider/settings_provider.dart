@@ -15,7 +15,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:nav_router/nav_router.dart';
 import 'package:provider/provider.dart';
-import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 enum SettingType { bool, string, string_list }
 
@@ -41,7 +40,11 @@ class SettingsProvider extends ChangeNotifier {
   ResultListProvider localProvider;
   ResultListProvider notificationProvider;
   ResultListProvider federatedProvider;
-  RefreshController settingController;
+  // Callback que a tela de Perfil ("Me") registra para se atualizar quando
+  // o usuário toca de novo no ícone da aba já ativa (era um RefreshController
+  // do pull_to_refresh; virou um callback simples porque o perfil agora usa
+  // o mesmo NestedScrollView com abas usado no perfil público).
+  Future<void> Function() settingRefreshCallback;
 
   Map<String, int> unread = {};
   Map<String, String> latestIds = {};
@@ -123,8 +126,8 @@ class SettingsProvider extends ChangeNotifier {
     notificationProvider = provider;
   }
 
-  setSettingController(RefreshController controller) {
-    settingController = controller;
+  setSettingRefreshCallback(Future<void> Function() callback) {
+    settingRefreshCallback = callback;
   }
 
   _clearRootProviders() {
@@ -132,7 +135,7 @@ class SettingsProvider extends ChangeNotifier {
     localProvider = null;
     notificationProvider = null;
     federatedProvider = null;
-    settingController = null;
+    settingRefreshCallback = null;
   }
 
   _loadFromStorage() async {
