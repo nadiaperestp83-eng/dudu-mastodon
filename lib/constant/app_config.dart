@@ -24,7 +24,7 @@ class AppConfig {
     'direct': IconFont.message
   };
 
-  // ---- Servidor e credenciais fixas do Orkutodon ----
+  // ---- Servidor e credenciais fixas do Vkton ----
   // O app não registra mais um cliente OAuth dinamicamente a cada login:
   // ele usa sempre este servidor e este Client ID/Secret, gerados manualmente
   // em organica.social e injetados no build via --dart-define (GitHub Secrets).
@@ -32,7 +32,7 @@ class AppConfig {
 
   static const String fixedRedirectUri = String.fromEnvironment(
     'MASTODON_REDIRECT_URI',
-    defaultValue: 'https://orkutodon.app/redirect.html',
+    defaultValue: 'https://vkton.app/redirect.html',
   );
 
   static const String fixedClientId = String.fromEnvironment(
