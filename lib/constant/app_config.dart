@@ -27,8 +27,8 @@ class AppConfig {
   // ---- Servidor e credenciais fixas do Orkutodon ----
   // O app não registra mais um cliente OAuth dinamicamente a cada login:
   // ele usa sempre este servidor e este Client ID/Secret, gerados manualmente
-  // em mastodon.social e injetados no build via --dart-define (GitHub Secrets).
-  static const String fixedHost = 'https://mastodon.social';
+  // em organica.social e injetados no build via --dart-define (GitHub Secrets).
+  static const String fixedHost = 'https://organica.social';
 
   static const String fixedRedirectUri = String.fromEnvironment(
     'MASTODON_REDIRECT_URI',
