@@ -264,9 +264,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                       ? () {
                           if (_tabIndex == 3) {
                             SettingsProvider()
-                                .settingController
-                                .requestRefresh(
-                                    duration: Duration(milliseconds: 100));
+                                .settingRefreshCallback
+                                ?.call();
                           } else {
                             SettingsProvider().setHomeTabIndex(3);
                           }
