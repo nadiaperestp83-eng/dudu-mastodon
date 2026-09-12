@@ -30,10 +30,7 @@ class AppConfig {
   // em organica.social e injetados no build via --dart-define (GitHub Secrets).
   static const String fixedHost = 'https://organica.social';
 
-  static const String fixedRedirectUri = String.fromEnvironment(
-    'MASTODON_REDIRECT_URI',
-    defaultValue: 'https://vkton.app/redirect.html',
-  );
+  static const String fixedRedirectUri = 'https://vkton.app/redirect.html';
 
   static const String fixedClientId = String.fromEnvironment(
     'MASTODON_CLIENT_ID',
