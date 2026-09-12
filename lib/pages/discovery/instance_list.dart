@@ -4,7 +4,7 @@ import 'package:dudu/pages/login/signup.dart';
 import 'package:dudu/public.dart';
 import 'package:flutter/material.dart';
 
-// Tela fixa de entrada (instância única: mastodon.social), com a
+// Tela fixa de entrada (instância única: organica.social), com a
 // identidade visual do Vkton. Substitui a antiga tela de "descobrir
 // instâncias" (Discovery/Add Instance).
 class InstanceList extends StatelessWidget {
