@@ -36,7 +36,7 @@ class _LoginState extends State<Login> {
 
   bool isLoading = false; // 是否登录成功获取token中
 
-  // Servidor fixo: sempre mastodon.social, sem tela de escolha.
+  // Servidor fixo: sempre organica.social, sem tela de escolha.
   final String _hostUrl = AppConfig.fixedHost;
 
   @override
