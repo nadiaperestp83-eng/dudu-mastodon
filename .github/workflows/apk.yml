@@ -85,7 +85,6 @@ jobs:
         env:
           MASTODON_CLIENT_ID: ${{ secrets.MASTODON_CLIENT_ID }}
           MASTODON_CLIENT_SECRET: ${{ secrets.MASTODON_CLIENT_SECRET }}
-          MASTODON_REDIRECT_URI: ${{ secrets.MASTODON_REDIRECT_URI }}
         run: |
           flutter pub get
           sed -i '/^cached_video_player=/d' .flutter-plugins || true
@@ -122,8 +121,7 @@ jobs:
 
           flutter build apk --release --no-pub \
             --dart-define=MASTODON_CLIENT_ID=$MASTODON_CLIENT_ID \
-            --dart-define=MASTODON_CLIENT_SECRET=$MASTODON_CLIENT_SECRET \
-            --dart-define=MASTODON_REDIRECT_URI=$MASTODON_REDIRECT_URI
+            --dart-define=MASTODON_CLIENT_SECRET=$MASTODON_CLIENT_SECRET
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
