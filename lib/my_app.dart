@@ -9,8 +9,8 @@ import 'package:nav_router/nav_router.dart';
 import 'package:provider/provider.dart';
 
 import 'models/logined_user.dart';
+import 'pages/discovery/instance_list.dart';
 import 'pages/home_page.dart';
-import 'pages/login/login.dart';
 
 LoginedUser user = new LoginedUser();
 
@@ -77,10 +77,11 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Sem login: vai direto para a tela de Login, sem barra de navegação.
-    // A aba "Discover" (instâncias) foi removida do app.
+    // Sem login: mostra a tela de entrada (Vkton), com os botões "Entrar"
+    // (usuário já cadastrado no organica.social) e "Criar conta" (cadastro
+    // novo). Antes pulava direto pro fluxo de OAuth, sem opção de cadastro.
     if (!logined) {
-      return Login();
+      return InstanceList();
     }
     return Scaffold(
         body: HomePage(
