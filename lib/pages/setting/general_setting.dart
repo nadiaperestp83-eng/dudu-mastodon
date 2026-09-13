@@ -4,7 +4,7 @@ import 'package:dudu/models/instance/instance_manager.dart';
 import 'package:dudu/models/local_account.dart';
 import 'package:dudu/models/logined_user.dart';
 import 'package:dudu/models/provider/settings_provider.dart';
-import 'package:dudu/pages/login/login.dart';
+import 'package:dudu/pages/discovery/instance_list.dart';
 import 'package:dudu/pages/setting/about_app.dart';
 import 'package:dudu/pages/setting/account_switch.dart';
 import 'package:dudu/pages/setting/setting_content.dart';
@@ -78,7 +78,7 @@ class _GeneralSettingState extends State<GeneralSetting> {
     } else {
       SettingsProvider().setHomeTabIndex(0);
       SettingsProvider().setCurrentUser(null);
-      AppNavigate.pushAndRemoveUntil(Login());
+      AppNavigate.pushAndRemoveUntil(InstanceList());
     }
   }
 
