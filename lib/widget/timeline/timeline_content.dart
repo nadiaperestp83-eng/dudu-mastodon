@@ -15,6 +15,9 @@ class TimelineContent extends StatefulWidget {
   // itens vindos da API, para permitir que widgets como a barra de post e o
   // carrossel de sugestões rolem junto com o feed (item 0..N do rowBuilder).
   final int addToSliverCount;
+  // Widget customizado para o estado "sem resultados" (ex: inbox de chat
+  // vazia). Se omitido, usa o EmptyView genérico padrão da lista.
+  final Widget emptyView;
 
   TimelineContent(
       {this.url,
@@ -22,7 +25,8 @@ class TimelineContent extends StatefulWidget {
       this.rowBuilder,
       this.prefixId = true,
       this.provider,
-      this.addToSliverCount = 0});
+      this.addToSliverCount = 0,
+      this.emptyView});
   @override
   _TimelineContentState createState() => _TimelineContentState();
 }
@@ -62,6 +66,9 @@ class _TimelineContentState extends State<TimelineContent> {
           break;
         case 'notifications':
           SettingsProvider().setNotificationProvider(provider);
+          break;
+        case 'conversations':
+          SettingsProvider().setConversationProvider(provider);
       }
 
       _scrollController = ScrollController(
@@ -91,6 +98,7 @@ class _TimelineContentState extends State<TimelineContent> {
               return ProviderEasyRefreshListView(
                 scrollController: _scrollController,
                 addToSliverCount: widget.addToSliverCount,
+                emptyView: widget.emptyView,
               );
             });
   }
