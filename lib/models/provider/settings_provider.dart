@@ -40,6 +40,7 @@ class SettingsProvider extends ChangeNotifier {
   ResultListProvider localProvider;
   ResultListProvider notificationProvider;
   ResultListProvider federatedProvider;
+  ResultListProvider conversationProvider;
   // Callback que a tela de Perfil ("Me") registra para se atualizar quando
   // o usuário toca de novo no ícone da aba já ativa (era um RefreshController
   // do pull_to_refresh; virou um callback simples porque o perfil agora usa
@@ -122,6 +123,10 @@ class SettingsProvider extends ChangeNotifier {
     federatedProvider = provider;
   }
 
+  setConversationProvider(ResultListProvider provider) {
+    conversationProvider = provider;
+  }
+
   setNotificationProvider(ResultListProvider provider) {
     notificationProvider = provider;
   }
@@ -135,6 +140,7 @@ class SettingsProvider extends ChangeNotifier {
     localProvider = null;
     notificationProvider = null;
     federatedProvider = null;
+    conversationProvider = null;
     settingRefreshCallback = null;
   }
 
