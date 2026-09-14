@@ -9,6 +9,7 @@ import 'package:dudu/models/task/get_emoji_task.dart';
 import 'package:dudu/models/task/notification_task.dart';
 import 'package:dudu/models/task/register_help_task.dart';
 import 'package:dudu/models/task/update_task.dart';
+import 'package:dudu/pages/timeline/conversations_timeline.dart';
 import 'package:dudu/pages/timeline/local_timeline.dart';
 import 'package:dudu/pages/timeline/notification_timeline.dart';
 import 'package:dudu/pages/timeline/public_timeline.dart';
@@ -89,6 +90,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     Icons.people_outline,
     Icons.notifications_outlined,
     Icons.person_outline,
+    Icons.chat_bubble_outline,
   ];
 
   List<IconData> _tabIconsFilled = [
@@ -96,6 +98,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     Icons.people,
     Icons.notifications,
     Icons.person,
+    Icons.chat_bubble,
   ];
 
   List<String> get _tabTitles {
@@ -103,7 +106,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       S.of(context).home,
       S.of(context).square,
       S.of(context).news,
-      S.of(context).me
+      S.of(context).me,
+      S.of(context).chat,
     ];
   }
 
@@ -149,7 +153,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                           )
                         : Container(),
                     widget.logined ? NotificationTimeline() : Container(),
-                    widget.logined ? Setting() : Container()
+                    widget.logined ? Setting() : Container(),
+                    widget.logined
+                        ? ConversationTimeline(embedded: true)
+                        : Container(),
                   ],
                   index: homeTabIndex,
                 ),
@@ -232,8 +239,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                   logined: logined,
                   showBadge: showBadge &&
                       logined &&
-                      (provider.unread[TimelineApi.conversations] != 0 ||
-                          provider.unread[TimelineApi.followRquest] != 0 ||
+                      (provider.unread[TimelineApi.followRquest] != 0 ||
                           provider.unread[TimelineApi.follow] != 0 ||
                           provider.unread[TimelineApi.mention] != 0 ||
                           provider.unread[TimelineApi.reblogNotification] !=
@@ -268,6 +274,27 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                                 ?.call();
                           } else {
                             SettingsProvider().setHomeTabIndex(3);
+                          }
+                        }
+                      : () => DialogUtils.showInfoDialog(
+                          context, S.of(context).need_login_before_operate),
+                ),
+                _topNavItem(
+                  index: 4,
+                  tabIndex: _tabIndex,
+                  activeColor: activeColor,
+                  logined: logined,
+                  showBadge: showBadge &&
+                      logined &&
+                      provider.unread[TimelineApi.conversations] != 0,
+                  onTap: logined
+                      ? () {
+                          if (_tabIndex == 4) {
+                            provider.conversationProvider?.refreshController
+                                ?.requestRefresh(
+                                    duration: Duration(milliseconds: 100));
+                          } else {
+                            SettingsProvider().setHomeTabIndex(4);
                           }
                         }
                       : () => DialogUtils.showInfoDialog(
