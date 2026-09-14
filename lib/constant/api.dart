@@ -44,4 +44,7 @@ class Api {
   static String UnFavouritesArticle(arg) {
     return '/api/v1/statuses/$arg/unfavourite'; // 取消收藏某个文章
   }
+  static String conversationRead(arg) {
+    return '/api/v1/conversations/$arg/read';
+  }
 }
