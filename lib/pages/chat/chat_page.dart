@@ -247,7 +247,8 @@ class _ChatPageState extends State<ChatPage> {
   Widget _buildMessageList() {
     if (_loading) {
       return Center(
-          child: CircularProgressIndicator(color: FbColors.primaryBlue));
+          child: CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(FbColors.primaryBlue)));
     }
     if (_messages.isEmpty) {
       return Center(
